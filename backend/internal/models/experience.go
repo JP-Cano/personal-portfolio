@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type WorkType string
 
@@ -11,7 +15,7 @@ const (
 )
 
 type Experience struct {
-	ID          uint       `json:"id" gorm:"primaryKey;autoIncrement"`
+	gorm.Model
 	Title       string     `json:"title" gorm:"type:varchar(255);not null"`
 	Company     string     `json:"company" gorm:"type:varchar(255);not null"`
 	Location    string     `json:"location" gorm:"type:varchar(255)"`
@@ -19,6 +23,4 @@ type Experience struct {
 	StartDate   time.Time  `json:"start_date" gorm:"type:date;not null"`
 	EndDate     *time.Time `json:"end_date,omitempty"`
 	Description string     `json:"description" gorm:"type:text"`
-	CreatedAt   time.Time  `json:"created_at" gorm:"autoCreateTime"`
-	UpdatedAt   time.Time  `json:"updated_at" gorm:"autoUpdateTime"`
 }

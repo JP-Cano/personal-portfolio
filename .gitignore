@@ -26,3 +26,12 @@ go.work.sum
 .env
 
 .idea
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+
+# Air (hot reload) temporary files
+tmp/
+build-errors.log

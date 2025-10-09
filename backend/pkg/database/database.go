@@ -1,9 +1,12 @@
 package database
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 
-	"github.com/JuanPabloCano/personal-portfolio/backend/internal/models"
+	_ "github.com/mattn/go-sqlite3"
+	"github.com/pressly/goose/v3"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -18,25 +21,37 @@ func InitDB(dbPath string) error {
 		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to connect to database: %w", err)
 	}
 
 	log.Println("Database connection established")
+	return nil
+}
 
-	err = AutoMigrate()
+func RunMigrations(dbPath, migrationsDir string) error {
+	db, err := sql.Open("sqlite3", dbPath)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open database for migrations: %w", err)
+	}
+
+	defer func(db *sql.DB) {
+		err := db.Close()
+		if err != nil {
+			log.Printf("failed to close database connection: %v", err)
+			panic(err)
+		}
+	}(db)
+
+	if err := goose.SetDialect("sqlite3"); err != nil {
+		return fmt.Errorf("failed to set goose dialect: %w", err)
+	}
+
+	if err := goose.Up(db, migrationsDir); err != nil {
+		return fmt.Errorf("failed to run migrations: %w", err)
 	}
 
 	log.Println("Database migrations completed successfully")
 	return nil
-}
-
-func AutoMigrate() error {
-	return DB.AutoMigrate(
-		&models.Project{},
-		&models.Experience{},
-	)
 }
 
 func GetDB() *gorm.DB {

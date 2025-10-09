@@ -1,16 +1,16 @@
 build:
 	@echo "✨ Building backend..."
-	cd backend && go build -o ../dist/backend
+	cd backend && make build
 	@echo "✨ Building frontend..."
-	cd frontend && npm install && npm run build
+	cd frontend && pnpm install && pnpm run build
 
 dev:
 	@echo "🚀 Starting backend (dev)..."
-	cd backend && go run main.go &
+	cd backend && make dev &
 	@echo "🚀 Starting frontend (dev)..."
-	cd frontend && npm run dev
+	cd frontend && pnpm run dev
 
 clean:
 	@echo "🗑️  Cleaning dist/ and node_modules..."
 	rm -rf dist
-	cd frontend && rm -rf node_modules package-lock.json .svelte-kit
+	cd frontend && rm -rf node_modules package-lock.json

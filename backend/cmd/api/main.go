@@ -10,17 +10,27 @@ import (
 )
 
 func main() {
-	databasePath := os.Getenv("DATABASE_PATH")
-	err := database.InitDB(databasePath)
+	dbPath := os.Getenv("DATABASE_PATH")
+	if dbPath == "" {
+		dbPath = "portfolio.db"
+	}
+
+	migrationsDir := "migrations"
+
+	err := database.InitDB(dbPath)
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
 	defer func() {
-		err := database.CloseDB()
-		if err != nil {
-			log.Fatalf("Failed to close database: %v", err)
+		if err := database.CloseDB(); err != nil {
+			log.Printf("Error closing database: %v", err)
 		}
 	}()
+
+	err = database.RunMigrations(dbPath, migrationsDir)
+	if err != nil {
+		log.Fatalf("Failed to run migrations: %v", err)
+	}
 
 	r := gin.Default()
 
