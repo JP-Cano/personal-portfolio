@@ -1,27 +1,27 @@
 ---
-import Section from "@/components/Section.astro";
 import { skills } from "@resume";
-import JavaScript from "@/icons/JavaScript.astro";
-import TypeScript from "@/icons/TypeScript.astro";
-import Git from "@/icons/Git.astro";
-import PostgreSQL from "@/icons/PostgreSql.astro";
-import NodeJs from "@/icons/Node.astro";
-import Redis from "@/icons/Redis.astro";
-import GitHub from "@/icons/GitHub.astro";
+import Section from "@/components/Section.astro";
 import AWS from "@/icons/Aws.astro";
 import Docker from "@/icons/Docker.astro";
-import Go from "@/icons/Go.astro";
-import NestJs from "@/icons/NestJs.astro";
-import MongoDB from "@/icons/Mongo.astro";
-import Kafka from "@/icons/Kafka.astro";
-import Jest from "@/icons/Jest.astro";
-import Kubernetes from "@/icons/Kubernetes.astro";
+import Git from "@/icons/Git.astro";
+import GitHub from "@/icons/GitHub.astro";
 import GitLab from "@/icons/GitLab.astro";
-import Slack from "@/icons/Slack.astro";
+import Go from "@/icons/Go.astro";
 import GraphQL from "@/icons/Graphql.astro";
-import Scrum from "@/icons/Scrum.astro";
+import JavaScript from "@/icons/JavaScript.astro";
+import Jest from "@/icons/Jest.astro";
 import Jira from "@/icons/Jira.astro";
+import Kafka from "@/icons/Kafka.astro";
+import Kubernetes from "@/icons/Kubernetes.astro";
+import MongoDB from "@/icons/Mongo.astro";
+import NestJs from "@/icons/NestJs.astro";
+import NodeJs from "@/icons/Node.astro";
+import PostgreSQL from "@/icons/PostgreSql.astro";
 import React from "@/icons/React.astro";
+import Redis from "@/icons/Redis.astro";
+import Scrum from "@/icons/Scrum.astro";
+import Slack from "@/icons/Slack.astro";
+import TypeScript from "@/icons/TypeScript.astro";
 
 const SKILLS_ICONS: Record<string, any> = {
   NodeJs,
@@ -46,41 +46,240 @@ const SKILLS_ICONS: Record<string, any> = {
   Jira,
   React,
 };
+
+const skillCategories = [
+  {
+    title: "Languages & Frameworks",
+    skills: skills.filter((s) =>
+      [
+        "NodeJs",
+        "NestJs",
+        "TypeScript",
+        "JavaScript",
+        "Go",
+        "React",
+        "GraphQL",
+      ].includes(s.name)
+    ),
+  },
+  {
+    title: "Databases",
+    skills: skills.filter((s) =>
+      ["PostgreSQL", "MongoDB", "Redis"].includes(s.name)
+    ),
+  },
+  {
+    title: "DevOps & Tools",
+    skills: skills.filter((s) =>
+      [
+        "Docker",
+        "Kubernetes",
+        "AWS",
+        "Git",
+        "GitHub",
+        "GitLab",
+        "Kafka",
+        "Jest",
+      ].includes(s.name)
+    ),
+  },
+  {
+    title: "Collaboration",
+    skills: skills.filter((s) => ["Slack", "Jira", "Scrum"].includes(s.name)),
+  },
+];
 ---
 
-<Section title="Skills">
-  <ul>
+<Section title="Skills" id="skills">
+  <div class="skills-container">
     {
-      skills.map(({ name }) => {
-        const iconName = name === "Next.js" ? "Next" : name;
-        const Icon = SKILLS_ICONS[iconName];
+      skillCategories.map((category, categoryIndex) => (
+        <div
+          class="skill-category"
+          style={`animation-delay: ${categoryIndex * 0.1}s`}
+        >
+          <h3 class="category-title">{category.title}</h3>
+          <ul class="skills-list">
+            {category.skills.map(({ name }, index) => {
+              const iconName = name === "Next.js" ? "Next" : name;
+              const Icon = SKILLS_ICONS[iconName];
 
-        return (
-          <li>
-            {Icon && <Icon />} <span>{name}</span>
-          </li>
-        );
-      })
+              return (
+                <li
+                  class="skill-item"
+                  style={`animation-delay: ${categoryIndex * 0.1 + index * 0.05}s`}
+                >
+                  <div class="skill-content">
+                    {Icon && (
+                      <div class="skill-icon">
+                        <Icon />
+                      </div>
+                    )}
+                    <span class="skill-name">{name}</span>
+                  </div>
+                  <div class="skill-glow" />
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))
     }
-  </ul>
+  </div>
 </Section>
 
 <style>
-  ul {
-    display: inline-flex;
-    gap: 8px;
-    flex-wrap: wrap;
+  .skills-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2.5rem;
   }
 
-  li {
-    align-items: center;
-    background: #eee;
-    border-radius: 6px;
-    color: black;
+  .skill-category {
+    animation: fadeInUp 0.6s ease backwards;
+  }
+
+  .category-title {
+    font-size: 1.25rem;
+    color: var(--color-text);
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--color-border);
+    position: relative;
+  }
+
+  .category-title::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 50px;
+    height: 2px;
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-secondary) 100%
+    );
+  }
+
+  .skills-list {
     display: flex;
-    font-size: 0.8rem;
-    font-weight: 500;
-    gap: 4px;
-    padding: 0.2rem 0.6rem;
+    flex-direction: column;
+    gap: 0.75rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .skill-item {
+    position: relative;
+    animation: slideInRight 0.5s ease backwards;
+  }
+
+  .skill-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    background: white;
+    border: 2px solid var(--color-border);
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1;
+  }
+
+  .skill-item:hover .skill-content {
+    transform: translateX(8px);
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.05) 0%,
+      rgba(139, 92, 246, 0.05) 100%
+    );
+  }
+
+  .skill-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+
+  .skill-item:hover .skill-icon {
+    transform: scale(1.2) rotate(5deg);
+  }
+
+  .skill-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    transition: color 0.3s ease;
+  }
+
+  .skill-item:hover .skill-name {
+    color: var(--color-primary);
+  }
+
+  .skill-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-secondary) 100%
+    );
+    border-radius: 12px;
+    opacity: 0;
+    filter: blur(15px);
+    transition: opacity 0.3s ease;
+    z-index: 0;
+  }
+
+  .skill-item:hover .skill-glow {
+    opacity: 0.3;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInRight {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @media (width <= 768px) {
+    .skills-container {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .skill-content {
+      padding: 0.75rem 1rem;
+    }
+
+    .skill-name {
+      font-size: 0.95rem;
+    }
   }
 </style>

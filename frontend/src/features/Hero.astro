@@ -1,14 +1,13 @@
 ---
+import { basics } from "@resume";
 import ContactLinks from "@/components/ContactLinks.astro";
-import Section from "@/components/Section.astro";
 import GitHub from "@/icons/GitHub.astro";
 import LinkedIn from "@/icons/LinkedIn.astro";
 import WorldMap from "@/icons/WorldMap.astro";
-import { basics } from "@resume";
 
-const { name, label, email, phone, profiles, location, image } = basics;
+const { name, label, email, phone, profiles, location } = basics;
 
-const { postalCode, city, countryCode, region } = location;
+const { city, region } = location;
 
 const SOCIAL_MEDIA_ICONS: Record<string, any> = {
   LinkedIn,
@@ -16,107 +15,330 @@ const SOCIAL_MEDIA_ICONS: Record<string, any> = {
 };
 ---
 
-<Section>
-  <div class="container">
-    <div class="info">
-      <h1>{name}</h1>
-      <h2>{label}</h2>
-      <span>
+<section class="hero" id="hero">
+  <div class="hero-container">
+    <div class="hero-content">
+      <div class="greeting">
+        <span class="wave">👋</span>
+        <span>Hi, I'm</span>
+      </div>
+      <h1 class="hero-title">
+        <span class="name-gradient">{name}</span>
+      </h1>
+      <h2 class="hero-subtitle">{label}</h2>
+      <p class="hero-description">
+        Crafting elegant solutions to complex problems. Passionate about
+        building scalable web applications and exploring cutting-edge
+        technologies.
+      </p>
+      <div class="hero-location">
         <WorldMap />
-        {city}, {region}
-      </span>
+        <span>{city}, {region}</span>
+      </div>
 
-      <footer>
+      <div class="hero-actions">
         <ContactLinks
           email={email}
           phone={phone}
           profiles={profiles}
           socialMediaIcons={SOCIAL_MEDIA_ICONS}
         />
-      </footer>
+      </div>
+
+      <div class="scroll-indicator">
+        <div class="mouse">
+          <div class="wheel"></div>
+        </div>
+        <span>Scroll to explore</span>
+      </div>
     </div>
-    <!--Validar si debo de agregar imagen -->
-    <!--<figure>-->
-    <!--    <img src={image} alt={name}/>-->
-    <!--</figure>-->
+
+    <div class="hero-visual">
+      <div class="floating-card card-1">
+        <div class="card-icon">💻</div>
+        <div class="card-text">Clean Code</div>
+      </div>
+      <div class="floating-card card-2">
+        <div class="card-icon">🚀</div>
+        <div class="card-text">Performance</div>
+      </div>
+      <div class="floating-card card-3">
+        <div class="card-icon">🎨</div>
+        <div class="card-text">Design</div>
+      </div>
+    </div>
   </div>
-</Section>
+</section>
 
 <style>
-  .container {
+  .hero {
+    min-height: 100vh;
     display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    justify-content: center;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    overflow: hidden;
   }
 
-  .info {
+  .hero-container {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
+
+  .hero-content {
+    z-index: 1;
+  }
+
+  .greeting {
     display: flex;
-    flex-direction: column;
+    align-items: center;
     gap: 0.5rem;
-    padding-right: 32px;
+    font-size: 1.2rem;
+    color: var(--color-text-light);
+    margin-bottom: 1rem;
+    animation: slideInLeft 0.6s ease;
   }
 
-  h1 {
+  .wave {
+    display: inline-block;
+    animation: wave 2s ease-in-out infinite;
     font-size: 2rem;
   }
 
-  h2 {
-    color: #444;
-    font-weight: 500;
+  @keyframes wave {
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+    10%,
+    30% {
+      transform: rotate(14deg);
+    }
+    20% {
+      transform: rotate(-8deg);
+    }
+    40% {
+      transform: rotate(14deg);
+    }
+    50% {
+      transform: rotate(0deg);
+    }
+  }
+
+  .hero-title {
+    margin-bottom: 0.5rem;
+    animation: slideInLeft 0.6s ease 0.1s backwards;
+  }
+
+  .name-gradient {
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-secondary) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-subtitle {
+    color: var(--color-text);
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    animation: slideInLeft 0.6s ease 0.2s backwards;
+  }
+
+  .hero-description {
     font-size: 1.1rem;
-    text-wrap: balance;
+    max-width: 600px;
+    margin-bottom: 2rem;
+    animation: slideInLeft 0.6s ease 0.3s backwards;
   }
 
-  img {
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
-    width: 128px;
-    border-radius: 16px;
-  }
-
-  span {
-    color: #666;
+  .hero-location {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
-    font-size: 0.85rem;
-    letter-spacing: -0.05rem;
+    gap: 0.5rem;
+    color: var(--color-text-light);
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    animation: slideInLeft 0.6s ease 0.4s backwards;
   }
 
-  footer {
-    color: #555;
-    font-size: 0.65rem;
+  .hero-actions {
+    animation: slideInLeft 0.6s ease 0.5s backwards;
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    gap: 4px;
-    margin-top: 8px;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-light);
+    font-size: 0.85rem;
+    opacity: 0.6;
+    animation: fadeIn 1s ease 1s backwards;
   }
 
-  @media (width <= 700px) {
-    .container {
-      flex-direction: column-reverse;
+  .mouse {
+    width: 24px;
+    height: 40px;
+    border: 2px solid var(--color-text-light);
+    border-radius: 12px;
+    position: relative;
+  }
+
+  .wheel {
+    width: 3px;
+    height: 8px;
+    background: var(--color-text-light);
+    border-radius: 2px;
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: scroll 1.5s ease infinite;
+  }
+
+  @keyframes scroll {
+    0% {
+      top: 8px;
+      opacity: 1;
+    }
+    100% {
+      top: 24px;
+      opacity: 0;
+    }
+  }
+
+  .hero-visual {
+    position: relative;
+    height: 500px;
+    animation: fadeIn 0.8s ease 0.6s backwards;
+  }
+
+  .floating-card {
+    position: absolute;
+    background: white;
+    padding: 1.5rem 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    transition: var(--transition);
+  }
+
+  .floating-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-icon {
+    font-size: 2rem;
+  }
+
+  .card-text {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .card-1 {
+    top: 10%;
+    right: 10%;
+    animation: float 3s ease infinite;
+  }
+
+  .card-2 {
+    top: 45%;
+    right: 25%;
+    animation: float 3s ease infinite 1s;
+  }
+
+  .card-3 {
+    bottom: 15%;
+    right: 5%;
+    animation: float 3s ease infinite 0.5s;
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  @keyframes slideInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (width <= 1024px) {
+    .hero-container {
+      grid-template-columns: 1fr;
+      gap: 3rem;
     }
 
-    .info {
-      justify-content: center;
-      align-items: center;
-      padding-right: 0;
-      text-align: center;
+    .hero-visual {
+      height: 300px;
     }
 
-    figure {
-      display: flex;
-      justify-content: center;
-      align-items: center;
+    .scroll-indicator {
+      display: none;
+    }
+  }
+
+  @media (width <= 768px) {
+    .hero {
+      padding: 6rem 1.5rem 3rem;
     }
 
-    h2 {
-      text-wrap: balance;
+    .hero-title {
+      font-size: 2.5rem;
     }
 
-    figure {
-      margin: 0 auto;
+    .hero-subtitle {
+      font-size: 1.5rem;
+    }
+
+    .hero-description {
+      font-size: 1rem;
+    }
+
+    .floating-card {
+      padding: 1rem 1.5rem;
+    }
+
+    .card-text {
+      font-size: 0.9rem;
     }
   }
 </style>

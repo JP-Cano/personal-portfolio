@@ -3,65 +3,166 @@ import { education } from "@resume";
 import Section from "@/components/Section.astro";
 ---
 
-<Section title="Education">
-  <ul>
+<Section title="Education" id="education">
+  <div class="education-grid">
     {
-      education.map(({ institution, startDate, endDate, area }) => {
-        const startYear = new Date(startDate).getFullYear();
-        const endYear =
-          endDate != null ? new Date(endDate).getFullYear() : "Actual";
-        const years = `${startYear} - ${endYear}`;
+      education.map(
+        ({ institution, startDate, endDate, area, studyType }, index) => {
+          const startYear = new Date(startDate).getFullYear();
+          const endYear =
+            endDate != null ? new Date(endDate).getFullYear() : "Present";
+          const years = `${startYear} - ${endYear}`;
 
-        return (
-          <li>
-            <article>
-              <header>
-                <div>
-                  <h3>{institution}</h3>
+          return (
+            <article
+              class="education-card"
+              style={`animation-delay: ${index * 0.1}s`}
+            >
+              <div class="card-icon">🎓</div>
+              <div class="card-content">
+                <h3 class="institution-name">{institution}</h3>
+                <p class="degree-area">
+                  {studyType ? `${studyType} in ` : ""}
+                  {area}
+                </p>
+                <div class="education-footer">
+                  <time class="year-badge">{years}</time>
                 </div>
-
-                <time>{years}</time>
-              </header>
-
-              <footer>
-                <p>{area}</p>
-              </footer>
+              </div>
+              <div class="card-decoration" />
             </article>
-          </li>
-        );
-      })
+          );
+        }
+      )
     }
-  </ul>
+  </div>
 </Section>
 
 <style>
-  ul {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
+  .education-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
   }
 
-  article h3 {
-    font-weight: 500;
-    color: #111;
+  .education-card {
+    position: relative;
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 2px solid var(--color-border);
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.6s ease backwards;
+    overflow: hidden;
   }
 
-  header {
+  .education-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.2);
+    border-color: var(--color-primary);
+  }
+
+  .education-card:hover .card-decoration {
+    opacity: 1;
+  }
+
+  .card-decoration {
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.05) 0%,
+      rgba(139, 92, 246, 0.05) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    transform: rotate(-45deg);
+  }
+
+  .card-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: inline-block;
+    transition: transform 0.3s ease;
+  }
+
+  .education-card:hover .card-icon {
+    transform: scale(1.1) rotate(5deg);
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .institution-name {
+    font-size: 1.5rem;
+    color: var(--color-text);
+    margin: 0 0 0.75rem 0;
+    line-height: 1.3;
+  }
+
+  .degree-area {
+    font-size: 1.05rem;
+    color: var(--color-text-light);
+    line-height: 1.6;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .education-footer {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 4px;
   }
 
-  time {
-    color: #555;
-    font-size: 0.85rem;
-    min-width: 102px;
+  .year-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.1) 0%,
+      rgba(139, 92, 246, 0.1) 100%
+    );
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-primary);
   }
 
-  @media (width <= 700px) {
-    time {
-      text-align: right;
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (width <= 768px) {
+    .education-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .education-card {
+      padding: 1.5rem;
+    }
+
+    .institution-name {
+      font-size: 1.25rem;
+    }
+
+    .degree-area {
+      font-size: 1rem;
     }
   }
 </style>

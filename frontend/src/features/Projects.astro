@@ -1,46 +1,60 @@
 ---
+import { projects } from "@resume";
 import Section from "@/components/Section.astro";
 import GitHub from "@/icons/GitHub.astro";
-import { projects } from "@resume";
 
 // Esta informacion viene desde el backend
 ---
 
-<Section title="Projects">
-  <ul>
+<Section title="Projects" id="projects">
+  <ul class="projects-grid">
     {
       projects.map(
         ({ url, description, highlights, name, isActive, github }) => {
           return (
-            <li>
-              <article>
-                <header>
-                  <h3>
-                    <a
-                      href={url}
-                      target="_blank"
-                      title={`Ver el proyecto ${name}`}
-                    >
-                      {name}
-                    </a>
-                    {isActive && <span>•</span>}
-                    {github && (
+            <li class="project-item">
+              <article class="project-card">
+                <div class="card-background" />
+                <header class="project-header">
+                  <div class="project-title-row">
+                    <h3 class="project-title">
                       <a
-                        class="github-code-link"
-                        href={github}
+                        href={url}
                         target="_blank"
-                        title={`Ver código fuente del proyecto ${name}`}
+                        rel="noopener"
+                        title={`Ver el proyecto ${name}`}
                       >
-                        <GitHub />
+                        {name}
                       </a>
+                    </h3>
+                    {isActive && (
+                      <span class="status-badge active">
+                        <span class="status-dot" />
+                        Active
+                      </span>
                     )}
-                  </h3>
-                  <p>{description}</p>
+                  </div>
+                  <p class="project-description">{description}</p>
                 </header>
-                <footer>
-                  {highlights.map((highlight) => {
-                    return <span>{highlight}</span>;
-                  })}
+                <footer class="project-footer">
+                  <div class="highlights">
+                    {highlights.map((highlight) => {
+                      return <span class="highlight-tag">{highlight}</span>;
+                    })}
+                  </div>
+                  {github && (
+                    <a
+                      class="github-link"
+                      href={github}
+                      target="_blank"
+                      rel="noopener"
+                      title={`Ver código fuente del proyecto ${name}`}
+                      aria-label="View on GitHub"
+                    >
+                      <GitHub />
+                      <span>View Code</span>
+                    </a>
+                  )}
                 </footer>
               </article>
             </li>
@@ -52,100 +66,222 @@ import { projects } from "@resume";
 </Section>
 
 <style>
-  ul {
+  .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-inline: -16px;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    padding: 0;
+    list-style: none;
   }
 
-  article {
-    border-radius: 8px;
-    border: 1px solid #f2f2f2;
-    gap: 16px;
-    display: flex;
-    flex-direction: column;
-    padding: 16px;
+  .project-item {
     height: 100%;
   }
 
-  article header {
-    flex: 1;
-  }
-
-  article h3 {
-    margin-bottom: 4px;
-  }
-
-  article a {
-    color: #111;
-  }
-
-  article a:hover {
-    text-decoration: underline;
-  }
-
-  article p {
-    font-size: 0.75rem;
-    line-height: 1.2rem;
-    margin-bottom: 4px;
-  }
-
-  article h3 span {
-    color: rgb(0, 188, 47);
-    animation-name: flicker;
-    animation-duration: 3s;
-    animation-timing-function: ease-in;
-    animation-iteration-count: infinite;
-  }
-
-  footer {
+  .project-card {
+    position: relative;
+    height: 100%;
     display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--color-border);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+  }
+
+  .card-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.05) 0%,
+      rgba(139, 92, 246, 0.05) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .project-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.2);
+    border-color: var(--color-primary);
+  }
+
+  .project-card:hover .card-background {
+    opacity: 1;
+  }
+
+  .project-header {
+    flex: 1;
+    z-index: 1;
+  }
+
+  .project-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
     flex-wrap: wrap;
-    gap: 4px;
-    font-size: 0.6rem;
   }
 
-  footer span {
-    border-radius: 6px;
-    background: #eee;
-    color: #444;
-    font-size: 0.6rem;
-    font-weight: 500;
-    padding: 0.2rem 0.6rem;
+  .project-title {
+    font-size: 1.5rem;
+    margin: 0;
   }
 
-  .github-code-link {
-    margin-left: 5px;
+  .project-title a {
+    color: var(--color-text);
+    position: relative;
+    transition: color 0.3s ease;
   }
 
-  @keyframes flicker {
-    0% {
-      opacity: 1;
-    }
-    50% {
-      opacity: 0.25;
-    }
+  .project-title a::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-secondary) 100%
+    );
+    transition: width 0.3s ease;
+  }
+
+  .project-title a:hover {
+    color: var(--color-primary);
+  }
+
+  .project-title a:hover::after {
+    width: 100%;
+  }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .status-badge.active {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,
     100% {
       opacity: 1;
     }
+    50% {
+      opacity: 0.3;
+    }
   }
 
-  @media (width <= 700px) {
-    ul {
-      margin-inline: 0px;
+  .project-description {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-text-light);
+    margin: 0;
+  }
+
+  .project-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    z-index: 1;
+  }
+
+  .highlights {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .highlight-tag {
+    padding: 0.4rem 0.8rem;
+    background: var(--color-bg-alt);
+    color: var(--color-text);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .project-card:hover .highlight-tag {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--color-primary);
+  }
+
+  .github-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background: var(--color-text);
+    color: white;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    align-self: flex-start;
+  }
+
+  .github-link:hover {
+    background: var(--color-primary);
+    transform: translateX(4px);
+  }
+
+  @media (width <= 768px) {
+    .projects-grid {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
     }
 
-    article {
-      border: none;
-      box-shadow: 0 1px 1px #f2f2f2;
-      padding: 0 0 16px 0;
+    .project-card {
+      padding: 1.5rem;
+    }
+
+    .project-title {
+      font-size: 1.25rem;
+    }
+
+    .project-description {
+      font-size: 0.95rem;
     }
   }
 
   @media print {
-    article h3 span {
-      animation-name: none;
+    .status-dot {
+      animation: none;
+    }
+
+    .project-card {
+      break-inside: avoid;
     }
   }
 </style>

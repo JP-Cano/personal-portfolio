@@ -1,131 +1,293 @@
 ---
-import Section from "@/components/Section.astro";
 import { work } from "@resume";
+import Section from "@/components/Section.astro";
 
 // Esta informacion viene desde el backend
 ---
 
-<Section title="Experience">
-  <ul>
+<Section title="Experience" id="experience">
+  <div class="timeline">
     {
       work.map(
-        ({ name, startDate, endDate, position, summary, highlights, url }) => {
+        (
+          { name, startDate, endDate, position, summary, highlights, url },
+          index
+        ) => {
           const startYear = new Date(startDate).getFullYear();
           const endYear =
-            endDate != null ? new Date(endDate).getFullYear() : "Actual";
+            endDate != null ? new Date(endDate).getFullYear() : "Present";
 
           return (
-            <li>
-              <article>
-                <header>
-                  <div>
-                    <h3>
-                      <a href={url} title={`Ver ${name}`} target="_blank">
-                        {name}
-                      </a>
-                    </h3>
-                    <h4>{position}</h4>
+            <div
+              class="timeline-item"
+              style={`animation-delay: ${index * 0.15}s`}
+            >
+              <div class="timeline-marker">
+                <div class="timeline-dot" />
+                <div class="timeline-line" />
+              </div>
+              <div class="timeline-content">
+                <div class="experience-card">
+                  <div class="card-header">
+                    <div class="title-section">
+                      <h3 class="company-name">
+                        <a
+                          href={url}
+                          title={`View ${name}`}
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          {name}
+                        </a>
+                      </h3>
+                      <h4 class="position-title">{position}</h4>
+                    </div>
+                    <div class="date-badge">
+                      <time datetime={startDate}>{startYear}</time>
+                      <span>-</span>
+                      <time datetime={endDate}>{endYear}</time>
+                    </div>
                   </div>
-
-                  <div>
-                    <time datetime={startDate} data-title={startDate}>
-                      {startYear}
-                    </time>
-                    {" - "}
-                    <time datetime={endDate} data-title={endDate}>
-                      {endYear}
-                    </time>
+                  <div class="card-body">
+                    <p class="experience-summary">{summary}</p>
+                    {highlights && highlights.length > 0 && (
+                      <ul class="highlights-list">
+                        {highlights.map((highlight) => (
+                          <li>{highlight}</li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
-                </header>
-
-                <footer>
-                  <p>{summary}</p>
-                </footer>
-              </article>
-            </li>
+                </div>
+              </div>
+            </div>
           );
         }
       )
     }
-  </ul>
+  </div>
 </Section>
 
 <style>
-  ul {
+  .timeline {
+    position: relative;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .timeline-item {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    animation: fadeInLeft 0.6s ease backwards;
+  }
+
+  .timeline-item:last-child .timeline-line {
+    display: none;
+  }
+
+  .timeline-marker {
+    position: relative;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    align-items: center;
+    padding-top: 0.5rem;
   }
 
-  article h3 {
-    font-weight: 500;
-    color: #111;
+  .timeline-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-secondary) 100%
+    );
+    border: 4px solid white;
+    box-shadow: 0 0 0 2px var(--color-primary);
+    z-index: 1;
+    transition: all 0.3s ease;
   }
 
-  article a {
-    color: #111;
+  .timeline-item:hover .timeline-dot {
+    transform: scale(1.2);
+    box-shadow:
+      0 0 0 4px var(--color-primary),
+      0 0 20px rgba(99, 102, 241, 0.5);
   }
 
-  article a:hover {
-    text-decoration: underline;
+  .timeline-line {
+    width: 2px;
+    flex: 1;
+    background: linear-gradient(
+      180deg,
+      var(--color-primary) 0%,
+      transparent 100%
+    );
+    margin-top: 0.5rem;
   }
 
-  article h4 {
-    color: #222;
-    font-weight: 400;
+  .timeline-content {
+    padding-bottom: 1rem;
   }
 
-  header {
+  .experience-card {
+    background: white;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 2px solid var(--color-border);
+    transition: all 0.3s ease;
+  }
+
+  .experience-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.15);
+    border-color: var(--color-primary);
+  }
+
+  .card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 4px;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
   }
 
-  time {
-    color: #555;
-    font-size: 0.85rem;
-    min-width: 102px;
-    cursor: default;
+  .title-section {
+    flex: 1;
   }
 
-  [data-title]:hover:after {
-    opacity: 1;
-    transition: all 0.1s ease-in-out 0.5s;
-    visibility: visible;
+  .company-name {
+    font-size: 1.5rem;
+    margin: 0 0 0.5rem 0;
+    color: var(--color-text);
   }
 
-  [data-title]:after {
-    content: attr(data-title);
-    background-color: #333;
-    color: #fff;
-    font-size: 0.75rem;
-    font-family:
-      Menlo,
-      Monaco,
-      Lucida Console,
-      "Courier New",
-      monospace;
-    position: absolute;
-    padding: 0.2rem 0.5rem;
-    bottom: -1.4rem;
-    left: 50%;
-    white-space: nowrap;
-    box-shadow: 1px 1px 1px #222222;
-    opacity: 0;
-    border: 1px solid #111111;
-    z-index: 99999;
-    visibility: hidden;
-    border-radius: 6px;
-  }
-
-  [data-title] {
+  .company-name a {
+    color: var(--color-text);
     position: relative;
+    transition: color 0.3s ease;
   }
 
-  @media (width <= 700px) {
-    time {
-      text-align: right;
+  .company-name a::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-secondary) 100%
+    );
+    transition: width 0.3s ease;
+  }
+
+  .company-name a:hover {
+    color: var(--color-primary);
+  }
+
+  .company-name a:hover::after {
+    width: 100%;
+  }
+
+  .position-title {
+    font-size: 1.1rem;
+    color: var(--color-text-light);
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .date-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.2rem;
+    background: var(--color-bg-alt);
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-text);
+    white-space: nowrap;
+  }
+
+  .card-body {
+    color: var(--color-text-light);
+  }
+
+  .experience-summary {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .highlights-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0 0;
+  }
+
+  .highlights-list li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .highlights-list li::before {
+    content: "▹";
+    position: absolute;
+    left: 0;
+    color: var(--color-primary);
+    font-size: 1.2rem;
+  }
+
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @media (width <= 768px) {
+    .timeline-item {
+      grid-template-columns: 30px 1fr;
+      gap: 1rem;
+    }
+
+    .timeline-dot {
+      width: 16px;
+      height: 16px;
+    }
+
+    .experience-card {
+      padding: 1.5rem;
+    }
+
+    .card-header {
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .date-badge {
+      align-self: flex-start;
+    }
+
+    .company-name {
+      font-size: 1.25rem;
+    }
+
+    .position-title {
+      font-size: 1rem;
     }
   }
 </style>

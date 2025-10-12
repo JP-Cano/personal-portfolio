@@ -6,10 +6,17 @@ import Hero from "@features/Hero.astro";
 import KeyboardManager from "@features/KeyboardManager.astro";
 import Projects from "@features/Projects.astro";
 import Skills from "@features/Skills.astro";
+import Footer from "@/components/Footer.astro";
+import Navigation from "@/components/Navigation.astro";
+import ScrollProgress from "@/components/ScrollProgress.astro";
+import ThreeBackground from "@/components/ThreeBackground.astro";
 import Layout from "@/layouts/Layout.astro";
 ---
 
-<Layout title="Minimalist Personal Portfolio">
+<Layout title="Juan Pablo Cano - Software Developer">
+  <ScrollProgress />
+  <ThreeBackground />
+  <Navigation />
   <main>
     <Hero />
     <About />
@@ -18,13 +25,48 @@ import Layout from "@/layouts/Layout.astro";
     <Projects />
     <Skills />
   </main>
+  <Footer />
   <KeyboardManager />
 </Layout>
 
+<script>
+  const observerOptions = {
+    threshold: 0.1,
+    rootMargin: "0px 0px -100px 0px",
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+      }
+    });
+  }, observerOptions);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const fadeElements = document.querySelectorAll(".fade-in");
+    fadeElements.forEach((el) => observer.observe(el));
+  });
+
+  window.addEventListener("load", () => {
+    document.body.style.opacity = "1";
+  });
+</script>
+
 <style>
+  :global(body) {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
   main {
-    padding: 4rem;
-    margin: auto;
-    width: 100%;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (width <= 768px) {
+    main {
+      padding-top: 0;
+    }
   }
 </style>

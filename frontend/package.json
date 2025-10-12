@@ -13,7 +13,9 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "astro": "^5.14.3"
+    "@types/three": "^0.180.0",
+    "astro": "^5.14.3",
+    "three": "^0.180.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.37.0",
