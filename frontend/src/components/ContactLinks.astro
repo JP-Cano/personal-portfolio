@@ -1,0 +1,75 @@
+---
+import Mail from "@/icons/Mail.astro";
+import Phone from "@/icons/Phone.astro";
+import { basics } from "@resume";
+
+interface Props {
+  email?: string;
+  phone?: string;
+  profiles?: typeof basics.profiles;
+  socialMediaIcons: Record<string, any>;
+}
+
+const { email, phone, profiles = [], socialMediaIcons } = Astro.props;
+---
+
+{
+  email && (
+    <a
+      href={`mailto:${email}`}
+      title={`Send email to ${email}`}
+      aria-label={`Send email to ${email}`}
+    >
+      <Mail />
+    </a>
+  )
+}
+{
+  phone && (
+    <a
+      href={`tel:${phone}`}
+      title={`Call ${phone}`}
+      aria-label={`Call ${phone}`}
+    >
+      <Phone />
+    </a>
+  )
+}
+
+{
+  profiles.map(({ network, url, username }) => {
+    const Icon = socialMediaIcons[network];
+    if (!Icon) return null;
+    return (
+      <a
+        href={url}
+        title={`${network}: ${username}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={`Visit my ${network} profile`}
+      >
+        <Icon />
+      </a>
+    );
+  })
+}
+
+<style>
+  a {
+    color: #777;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #eee;
+    padding: 4px;
+    height: 32px;
+    width: 32px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }
+
+  a:hover {
+    background: #eee;
+    border: 1px solid #ddd;
+  }
+</style>

@@ -1,9 +1,30 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
-
+import About from "@features/About.astro";
+import Education from "@features/Education.astro";
+import Experience from "@features/Experience.astro";
+import Hero from "@features/Hero.astro";
+import KeyboardManager from "@features/KeyboardManager.astro";
+import Projects from "@features/Projects.astro";
+import Skills from "@features/Skills.astro";
+import Layout from "@/layouts/Layout.astro";
 ---
 
-<Layout>
-	<Welcome />
+<Layout title="Minimalist Personal Portfolio">
+  <main>
+    <Hero />
+    <About />
+    <Experience />
+    <Education />
+    <Projects />
+    <Skills />
+  </main>
+  <KeyboardManager />
 </Layout>
+
+<style>
+  main {
+    padding: 4rem;
+    margin: auto;
+    width: 100%;
+  }
+</style>

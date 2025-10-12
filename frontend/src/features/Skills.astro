@@ -1,0 +1,86 @@
+---
+import Section from "@/components/Section.astro";
+import { skills } from "@resume";
+import JavaScript from "@/icons/JavaScript.astro";
+import TypeScript from "@/icons/TypeScript.astro";
+import Git from "@/icons/Git.astro";
+import PostgreSQL from "@/icons/PostgreSql.astro";
+import NodeJs from "@/icons/Node.astro";
+import Redis from "@/icons/Redis.astro";
+import GitHub from "@/icons/GitHub.astro";
+import AWS from "@/icons/Aws.astro";
+import Docker from "@/icons/Docker.astro";
+import Go from "@/icons/Go.astro";
+import NestJs from "@/icons/NestJs.astro";
+import MongoDB from "@/icons/Mongo.astro";
+import Kafka from "@/icons/Kafka.astro";
+import Jest from "@/icons/Jest.astro";
+import Kubernetes from "@/icons/Kubernetes.astro";
+import GitLab from "@/icons/GitLab.astro";
+import Slack from "@/icons/Slack.astro";
+import GraphQL from "@/icons/Graphql.astro";
+import Scrum from "@/icons/Scrum.astro";
+import Jira from "@/icons/Jira.astro";
+import React from "@/icons/React.astro";
+
+const SKILLS_ICONS: Record<string, any> = {
+  NodeJs,
+  NestJs,
+  TypeScript,
+  JavaScript,
+  Git,
+  PostgreSQL,
+  Redis,
+  GitHub,
+  AWS,
+  Docker,
+  Go,
+  MongoDB,
+  Kafka,
+  Jest,
+  Kubernetes,
+  GitLab,
+  Slack,
+  GraphQL,
+  Scrum,
+  Jira,
+  React,
+};
+---
+
+<Section title="Skills">
+  <ul>
+    {
+      skills.map(({ name }) => {
+        const iconName = name === "Next.js" ? "Next" : name;
+        const Icon = SKILLS_ICONS[iconName];
+
+        return (
+          <li>
+            {Icon && <Icon />} <span>{name}</span>
+          </li>
+        );
+      })
+    }
+  </ul>
+</Section>
+
+<style>
+  ul {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  li {
+    align-items: center;
+    background: #eee;
+    border-radius: 6px;
+    color: black;
+    display: flex;
+    font-size: 0.8rem;
+    font-weight: 500;
+    gap: 4px;
+    padding: 0.2rem 0.6rem;
+  }
+</style>
