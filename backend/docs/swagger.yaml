@@ -1,0 +1,255 @@
+basePath: /api/v1
+definitions:
+  dto.ExperienceRequest:
+    properties:
+      company:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      location:
+        type: string
+      start_date:
+        type: string
+      title:
+        type: string
+      type:
+        enum:
+        - Remote
+        - On Site
+        - Hybrid
+        type: string
+    required:
+    - company
+    - start_date
+    - title
+    - type
+    type: object
+  dto.ExperienceResponse:
+    properties:
+      company:
+        type: string
+      created_at:
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      id:
+        type: integer
+      location:
+        type: string
+      start_date:
+        type: string
+      title:
+        type: string
+      type:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  utils.ErrorResponse:
+    properties:
+      error:
+        type: string
+      message:
+        type: string
+    type: object
+  utils.SuccessResponse:
+    properties:
+      data: {}
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: API for managing personal portfolio experiences and projects
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Personal Portfolio API
+  version: "1.0"
+paths:
+  /experiences:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all work experiences ordered by start date
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of experiences
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.ExperienceResponse'
+                  type: array
+              type: object
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all experiences
+      tags:
+      - experiences
+    post:
+      consumes:
+      - application/json
+      description: Creates a new work experience entry
+      parameters:
+      - description: Experience data
+        in: body
+        name: experience
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ExperienceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Experience created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ExperienceResponse'
+              type: object
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create a new experience
+      tags:
+      - experiences
+  /experiences/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft deletes a work experience (sets deleted_at timestamp)
+      parameters:
+      - description: Experience ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Experience deleted successfully
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Invalid ID format
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Experience not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Delete an experience
+      tags:
+      - experiences
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a single work experience by its ID
+      parameters:
+      - description: Experience ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Experience details
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ExperienceResponse'
+              type: object
+        "400":
+          description: Invalid ID format
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Experience not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get experience by ID
+      tags:
+      - experiences
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing work experience
+      parameters:
+      - description: Experience ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Updated experience data
+        in: body
+        name: experience
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ExperienceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Experience updated successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ExperienceResponse'
+              type: object
+        "400":
+          description: Invalid ID or request body
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Experience not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Update an experience
+      tags:
+      - experiences
+schemes:
+- http
+- https
+swagger: "2.0"

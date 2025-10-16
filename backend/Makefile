@@ -99,3 +99,14 @@ dev: ## Run in development mode with auto-reload (requires air)
 	fi
 	@echo "$(BLUE)Starting development server with hot reload...$(NC)"
 	@air
+
+swagger: ## Generate swagger documentation
+	@echo "$(BLUE)Generating swagger documentation...$(NC)"
+	@swag init -g cmd/api/main.go -o docs
+	@echo "$(GREEN)Swagger documentation generated at docs/$(NC)"
+	@echo "$(YELLOW)View at: http://localhost:8080/swagger/index.html$(NC)"
+
+swagger-install: ## Install swag CLI tool
+	@echo "$(BLUE)Installing swag...$(NC)"
+	@go install github.com/swaggo/swag/cmd/swag@latest
+	@echo "$(GREEN)Swag installed$(NC)"
