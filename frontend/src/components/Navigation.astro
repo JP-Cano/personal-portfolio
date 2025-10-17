@@ -21,12 +21,11 @@
 </nav>
 
 <script>
-  // Scroll effect for navbar
   const navbar = document.querySelector(".navbar");
   let lastScroll = 0;
 
   window.addEventListener("scroll", () => {
-    const currentScroll = window.pageYOffset;
+    const currentScroll = window.scrollY;
 
     if (currentScroll > 100) {
       navbar?.classList.add("scrolled");

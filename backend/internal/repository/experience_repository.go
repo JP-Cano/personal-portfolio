@@ -12,7 +12,7 @@ type ExperienceRepository interface {
 	FindAll() ([]models.Experience, error)
 	FindByID(id uint) (*models.Experience, error)
 	Create(experience *models.Experience) error
-	Update(experience *models.Experience) error
+	Update(id uint, updates map[string]interface{}) error
 	Delete(id uint) error
 }
 
@@ -61,9 +61,18 @@ func (r *experienceRepository) Create(experience *models.Experience) error {
 }
 
 // Update modifies an existing experience in the database
-func (r *experienceRepository) Update(experience *models.Experience) error {
-	result := r.db.Save(experience)
-	return result.Error
+func (r *experienceRepository) Update(id uint, updates map[string]interface{}) error {
+	result := r.db.Model(&models.Experience{}).Where("id = ?", id).Updates(updates)
+
+	if result.Error != nil {
+		return result.Error
+	}
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+
+	return nil
 }
 
 // Delete removes an experience from the database

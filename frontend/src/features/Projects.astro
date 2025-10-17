@@ -1,5 +1,4 @@
 ---
-import { projects } from "@resume";
 import Section from "@/components/Section.astro";
 import GitHub from "@/icons/GitHub.astro";
 
@@ -9,7 +8,7 @@ import GitHub from "@/icons/GitHub.astro";
 <Section title="Projects" id="projects">
   <ul class="projects-grid">
     {
-      projects.map(
+      [].map(
         ({ url, description, highlights, name, isActive, github }) => {
           return (
             <li class="project-item">

@@ -3,22 +3,30 @@ definitions:
   dto.ExperienceRequest:
     properties:
       company:
+        maxLength: 255
+        minLength: 1
         type: string
       description:
         type: string
       end_date:
         type: string
       location:
+        maxLength: 255
         type: string
       start_date:
         type: string
       title:
+        maxLength: 255
+        minLength: 1
         type: string
       type:
         enum:
         - Remote
         - On Site
         - Hybrid
+        type: string
+      url:
+        maxLength: 500
         type: string
     required:
     - company
@@ -30,23 +38,113 @@ definitions:
     properties:
       company:
         type: string
-      created_at:
+      createdAt:
         type: string
       description:
         type: string
-      end_date:
+      endDate:
         type: string
       id:
         type: integer
       location:
         type: string
-      start_date:
+      startDate:
         type: string
       title:
         type: string
       type:
         type: string
-      updated_at:
+      updatedAt:
+        type: string
+      url:
+        type: string
+    type: object
+  dto.ProjectRequest:
+    properties:
+      description:
+        maxLength: 500
+        minLength: 1
+        type: string
+      end_date:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+      start_date:
+        type: string
+      url:
+        maxLength: 500
+        type: string
+    required:
+    - description
+    - name
+    - start_date
+    type: object
+  dto.ProjectResponse:
+    properties:
+      createdAt:
+        type: string
+      description:
+        type: string
+      endDate:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      startDate:
+        type: string
+      updatedAt:
+        type: string
+      url:
+        type: string
+    type: object
+  dto.UpdateExperienceRequest:
+    properties:
+      company:
+        maxLength: 255
+        minLength: 1
+        type: string
+      description:
+        type: string
+      end_date:
+        type: string
+      location:
+        maxLength: 255
+        type: string
+      start_date:
+        type: string
+      title:
+        maxLength: 255
+        minLength: 1
+        type: string
+      type:
+        enum:
+        - Remote
+        - On Site
+        - Hybrid
+        type: string
+      url:
+        maxLength: 500
+        type: string
+    type: object
+  dto.UpdateProjectRequest:
+    properties:
+      description:
+        maxLength: 500
+        minLength: 1
+        type: string
+      end_date:
+        type: string
+      name:
+        maxLength: 255
+        minLength: 1
+        type: string
+      start_date:
+        type: string
+      url:
+        maxLength: 500
         type: string
     type: object
   utils.ErrorResponse:
@@ -64,15 +162,8 @@ definitions:
     type: object
 host: localhost:8080
 info:
-  contact:
-    email: support@swagger.io
-    name: API Support
-    url: http://www.swagger.io/support
+  contact: {}
   description: API for managing personal portfolio experiences and projects
-  license:
-    name: Apache 2.0
-    url: http://www.apache.org/licenses/LICENSE-2.0.html
-  termsOfService: http://swagger.io/terms/
   title: Personal Portfolio API
   version: "1.0"
 paths:
@@ -206,22 +297,23 @@ paths:
       summary: Get experience by ID
       tags:
       - experiences
-    put:
+    patch:
       consumes:
       - application/json
-      description: Updates an existing work experience
+      description: Updates an existing work experience (partial update supported -
+        send only fields to update)
       parameters:
       - description: Experience ID
         in: path
         name: id
         required: true
         type: integer
-      - description: Updated experience data
+      - description: Fields to update
         in: body
         name: experience
         required: true
         schema:
-          $ref: '#/definitions/dto.ExperienceRequest'
+          $ref: '#/definitions/dto.UpdateExperienceRequest'
       produces:
       - application/json
       responses:
@@ -249,6 +341,180 @@ paths:
       summary: Update an experience
       tags:
       - experiences
+  /projects:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all projects
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of projects
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/dto.ProjectResponse'
+                  type: array
+              type: object
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all projects
+      tags:
+      - projects
+    post:
+      consumes:
+      - application/json
+      description: Creates a new project entry
+      parameters:
+      - description: Project data
+        in: body
+        name: project
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProjectRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Project created successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ProjectResponse'
+              type: object
+        "400":
+          description: Invalid request body or validation error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Create a new project
+      tags:
+      - projects
+  /projects/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft deletes a project (sets deleted_at timestamp)
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Project deleted successfully
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Invalid ID format
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Project not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Delete a project
+      tags:
+      - projects
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a single project by its ID
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Project details
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ProjectResponse'
+              type: object
+        "400":
+          description: Invalid ID format
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Project not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get project by ID
+      tags:
+      - projects
+    patch:
+      consumes:
+      - application/json
+      description: Updates an existing project (partial update supported - send only
+        fields to update)
+      parameters:
+      - description: Project ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Fields to update
+        in: body
+        name: project
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateProjectRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Project updated successfully
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ProjectResponse'
+              type: object
+        "400":
+          description: Invalid ID or request body
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Project not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Update a project
+      tags:
+      - projects
 schemes:
 - http
 - https

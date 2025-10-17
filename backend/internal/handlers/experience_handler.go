@@ -7,6 +7,7 @@ import (
 
 	"github.com/JuanPabloCano/personal-portfolio/backend/internal/handlers/dto"
 	"github.com/JuanPabloCano/personal-portfolio/backend/internal/services"
+	"github.com/JuanPabloCano/personal-portfolio/backend/pkg/constants"
 	"github.com/JuanPabloCano/personal-portfolio/backend/pkg/utils"
 	"github.com/gin-gonic/gin"
 )
@@ -62,7 +63,7 @@ func (h *ExperienceHandler) GetExperienceByID(c *gin.Context) {
 
 	experience, err := h.service.GetExperienceByID(uint(id))
 	if err != nil {
-		if errors.Is(err, services.ErrExperienceNotFound) {
+		if errors.Is(err, constants.ErrExperienceNotFound) {
 			utils.RespondWithError(c, http.StatusNotFound, "Experience not found", err)
 			return
 		}
@@ -86,20 +87,21 @@ func (h *ExperienceHandler) GetExperienceByID(c *gin.Context) {
 // @Failure 500 {object} utils.ErrorResponse "Internal server error"
 // @Router /experiences [post]
 func (h *ExperienceHandler) CreateExperience(c *gin.Context) {
-	var req dto.ExperienceRequest
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request body", err)
+	// Get a validated request from context (set by validation middleware)
+	req, exists := c.Get("validatedRequest")
+	if !exists {
+		utils.RespondWithError(c, http.StatusBadRequest, "Validation failed", nil)
 		return
 	}
 
-	experience := req.ToExperience()
+	experienceReq := req.(dto.ExperienceRequest)
+	experience, err := experienceReq.ToExperience()
+	if err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid date format", err)
+		return
+	}
 
 	if err := h.service.CreateExperience(experience); err != nil {
-		if errors.Is(err, services.ErrInvalidInput) {
-			utils.RespondWithError(c, http.StatusBadRequest, "", err)
-			return
-		}
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to create experience", err)
 		return
 	}
@@ -110,17 +112,17 @@ func (h *ExperienceHandler) CreateExperience(c *gin.Context) {
 
 // UpdateExperience godoc
 // @Summary Update an experience
-// @Description Updates an existing work experience
+// @Description Updates an existing work experience (partial update supported - send only fields to update)
 // @Tags experiences
 // @Accept json
 // @Produce json
 // @Param id path int true "Experience ID"
-// @Param experience body dto.ExperienceRequest true "Updated experience data"
+// @Param experience body dto.UpdateExperienceRequest true "Fields to update"
 // @Success 200 {object} utils.SuccessResponse{data=dto.ExperienceResponse} "Experience updated successfully"
 // @Failure 400 {object} utils.ErrorResponse "Invalid ID or request body"
 // @Failure 404 {object} utils.ErrorResponse "Experience not found"
 // @Failure 500 {object} utils.ErrorResponse "Internal server error"
-// @Router /experiences/{id} [put]
+// @Router /experiences/{id} [patch]
 func (h *ExperienceHandler) UpdateExperience(c *gin.Context) {
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
@@ -128,29 +130,31 @@ func (h *ExperienceHandler) UpdateExperience(c *gin.Context) {
 		return
 	}
 
-	var req dto.ExperienceRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		utils.RespondWithError(c, http.StatusBadRequest, "Invalid request body", err)
+	// Get a validated request from context (set by validation middleware)
+	req, exists := c.Get("validatedRequest")
+	if !exists {
+		utils.RespondWithError(c, http.StatusBadRequest, "Validation failed", nil)
 		return
 	}
 
-	experience := req.ToExperience()
+	updateReq := req.(dto.UpdateExperienceRequest)
 
-	if err := h.service.UpdateExperience(uint(id), experience); err != nil {
-		if errors.Is(err, services.ErrExperienceNotFound) {
+	updates, err := updateReq.ToUpdateMap()
+	if err != nil {
+		utils.RespondWithError(c, http.StatusBadRequest, "Invalid update data", err)
+		return
+	}
+
+	if err := h.service.UpdateExperience(uint(id), updates); err != nil {
+		if errors.Is(err, constants.ErrExperienceNotFound) {
 			utils.RespondWithError(c, http.StatusNotFound, "Experience not found", err)
-			return
-		}
-		if errors.Is(err, services.ErrInvalidInput) {
-			utils.RespondWithError(c, http.StatusBadRequest, "", err)
 			return
 		}
 		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to update experience", err)
 		return
 	}
 
-	response := dto.ToExperienceResponse(experience)
-	utils.RespondWithSuccess(c, http.StatusOK, response, "Experience updated successfully")
+	utils.RespondWithSuccess(c, http.StatusOK, nil, "Experience updated successfully")
 }
 
 // DeleteExperience godoc
@@ -173,7 +177,7 @@ func (h *ExperienceHandler) DeleteExperience(c *gin.Context) {
 	}
 
 	if err := h.service.DeleteExperience(uint(id)); err != nil {
-		if errors.Is(err, services.ErrExperienceNotFound) {
+		if errors.Is(err, constants.ErrExperienceNotFound) {
 			utils.RespondWithError(c, http.StatusNotFound, "Experience not found", err)
 			return
 		}

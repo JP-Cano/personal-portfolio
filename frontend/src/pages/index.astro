@@ -1,9 +1,10 @@
 ---
+export const prerender = true;
+
 import About from "@features/About.astro";
 import Education from "@features/Education.astro";
 import Experience from "@features/Experience.astro";
 import Hero from "@features/Hero.astro";
-import KeyboardManager from "@features/KeyboardManager.astro";
 import Projects from "@features/Projects.astro";
 import Skills from "@features/Skills.astro";
 import Footer from "@/components/Footer.astro";
@@ -26,7 +27,6 @@ import Layout from "@/layouts/Layout.astro";
     <Skills />
   </main>
   <Footer />
-  <KeyboardManager />
 </Layout>
 
 <script>

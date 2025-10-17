@@ -15,9 +15,11 @@
   "dependencies": {
     "@types/three": "^0.180.0",
     "astro": "^5.14.3",
-    "three": "^0.180.0"
+    "three": "^0.180.0",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@astrojs/node": "^9.5.0",
     "@eslint/js": "^9.37.0",
     "@typescript-eslint/parser": "^8.46.0",
     "eslint": "^9.37.0",
