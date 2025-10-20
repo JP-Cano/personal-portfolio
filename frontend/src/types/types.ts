@@ -20,7 +20,24 @@ export const experienceSchema = z.object({
   updatedAt: z.date(),
 });
 
+export const projectSchema = z.object({
+  id: z.uint32(),
+  name: z.string(),
+  description: z.string(),
+  url: z.url().optional(),
+  startDate: z.date(),
+  endDate: z.date().optional(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
 export const experienceRequestSchema = experienceSchema.omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const projectRequestSchema = projectSchema.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
@@ -29,6 +46,10 @@ export const experienceRequestSchema = experienceSchema.omit({
 export type Experience = z.infer<typeof experienceSchema>;
 export type ExperienceRequest = z.infer<typeof experienceRequestSchema>;
 export type Experiences = Array<Experience>;
+
+export type Project = z.infer<typeof projectSchema>;
+export type ProjectRequest = z.infer<typeof projectRequestSchema>;
+export type Projects = Array<Project>;
 
 /**
  * A TypeScript type that represents the result of an asynchronous operation that can either resolve with data

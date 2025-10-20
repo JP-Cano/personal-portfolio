@@ -1,15 +1,32 @@
 ---
-import Section from "@/components/Section.astro";
-import GitHub from "@/icons/GitHub.astro";
+export const prerender = false;
 
-// Esta informacion viene desde el backend
+import { api } from "@/api/api-client.ts";
+import { API_PATHS } from "@/utils/constants.ts";
+import { asyncThrowable } from "@/utils/utils.ts";
+import type { Projects } from "@/types/types.ts";
+import Section from "@/components/Section.astro";
+import ApiError from "@/components/ApiError.astro";
+
+const [projects, error] = await asyncThrowable<Projects>(() =>
+  api.get<Projects>(API_PATHS.PROJECTS)
+);
+
+const technologies = ["node", "java", "postgres"];
+
+const hasError = error !== null;
 ---
 
 <Section title="Projects" id="projects">
+  <ApiError hasError={hasError} error={error} data={projects} />
+
   <ul class="projects-grid">
     {
-      [].map(
-        ({ url, description, highlights, name, isActive, github }) => {
+      !hasError &&
+        projects &&
+        projects.length > 0 &&
+        projects.map(({ url, description, name, startDate, endDate, id }) => {
+          const isActive = !endDate;
           return (
             <li class="project-item">
               <article class="project-card">
@@ -21,7 +38,7 @@ import GitHub from "@/icons/GitHub.astro";
                         href={url}
                         target="_blank"
                         rel="noopener"
-                        title={`Ver el proyecto ${name}`}
+                        title={`View ${name}`}
                       >
                         {name}
                       </a>
@@ -36,35 +53,40 @@ import GitHub from "@/icons/GitHub.astro";
                   <p class="project-description">{description}</p>
                 </header>
                 <footer class="project-footer">
-                  <div class="highlights">
-                    {highlights.map((highlight) => {
-                      return <span class="highlight-tag">{highlight}</span>;
-                    })}
-                  </div>
-                  {github && (
+                  {technologies && technologies.length > 0 && (
+                    <div class="highlights">
+                      {technologies.map((tech) => {
+                        return <span class="highlight-tag">{tech}</span>;
+                      })}
+                    </div>
+                  )}
+                  {url && (
                     <a
                       class="github-link"
-                      href={github}
+                      href={url}
                       target="_blank"
                       rel="noopener"
-                      title={`Ver código fuente del proyecto ${name}`}
+                      title={`View ${name} on GitHub`}
                       aria-label="View on GitHub"
-                    >
-                      <GitHub />
-                      <span>View Code</span>
-                    </a>
+                    />
                   )}
                 </footer>
               </article>
             </li>
           );
-        }
-      )
+        })
     }
   </ul>
 </Section>
 
 <style>
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--color-text-light);
+    font-size: 1.1rem;
+  }
+
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -237,11 +259,11 @@ import GitHub from "@/icons/GitHub.astro";
   }
 
   .github-link {
+    margin-top: 16px;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     padding: 0.6rem 1.2rem;
-    background: var(--color-text);
     color: white;
     border-radius: 8px;
     font-size: 0.9rem;

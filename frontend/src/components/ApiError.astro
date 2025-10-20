@@ -1,0 +1,60 @@
+---
+import { ENVIRONMENT } from "astro:env/server";
+
+const { hasError, error, data } = Astro.props;
+---
+
+{
+  hasError && (
+    <div class="error-state">
+      <p>⚠️ Unable to load information. Please try again later.</p>
+      {ENVIRONMENT === "local" && (
+        <p class="error-details">{error?.toString()}</p>
+      )}
+    </div>
+  )
+}
+
+{
+  !hasError && (!data || data.length === 0) && (
+    <div class="empty-state">
+      <p>No data to display yet.</p>
+    </div>
+  )
+}
+
+<style>
+  .error-state {
+    background: #fee2e2;
+    border: 2px solid #ef4444;
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .error-state p {
+    color: #991b1b;
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+
+  .error-details {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    color: #7f1d1d;
+    font-family: monospace;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.5rem;
+    border-radius: 4px;
+    word-break: break-all;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    color: var(--color-text-light);
+    font-size: 1.1rem;
+  }
+</style>

@@ -2,11 +2,11 @@
 export const prerender = false;
 
 import { api } from "@/api/api-client.ts";
+import ApiError from "@/components/ApiError.astro";
+import Section from "@/components/Section.astro";
+import type { Experiences } from "@/types/types.ts";
 import { API_PATHS } from "@/utils/constants.ts";
 import { asyncThrowable } from "@/utils/utils.ts";
-import type { Experiences } from "@/types/types.ts";
-import Section from "@/components/Section.astro";
-import { ENVIRONMENT } from 'astro:env/server';
 
 const [experiences, error] = await asyncThrowable<Experiences>(() =>
   api.get<Experiences>(API_PATHS.EXPERIENCES)
@@ -16,24 +16,7 @@ const hasError = error !== null;
 ---
 
 <Section title="Experience" id="experience">
-  {
-    hasError && (
-      <div class="error-state">
-        <p>⚠️ Unable to load experiences. Please try again later.</p>
-        {ENVIRONMENT === 'local' && (
-          <p class="error-details">{error?.toString()}</p>
-        )}
-      </div>
-    )
-  }
-
-  {
-    !hasError && (!experiences || experiences.length === 0) && (
-      <div class="empty-state">
-        <p>No experiences to display yet.</p>
-      </div>
-    )
-  }
+  <ApiError hasError={hasError} error={error} data={experiences} />
 
   {
     !hasError && experiences && experiences.length > 0 && (
@@ -109,40 +92,6 @@ const hasError = error !== null;
 </Section>
 
 <style>
-  .error-state {
-    background: #fee2e2;
-    border: 2px solid #ef4444;
-    border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-
-  .error-state p {
-    color: #991b1b;
-    margin: 0;
-    font-weight: 600;
-    font-size: 1.1rem;
-  }
-
-  .error-details {
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    color: #7f1d1d;
-    font-family: monospace;
-    background: rgba(0, 0, 0, 0.05);
-    padding: 0.5rem;
-    border-radius: 4px;
-    word-break: break-all;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 3rem 2rem;
-    color: var(--color-text-light);
-    font-size: 1.1rem;
-  }
-
   .timeline {
     position: relative;
     max-width: 1000px;
