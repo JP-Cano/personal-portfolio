@@ -147,6 +147,39 @@ definitions:
         maxLength: 500
         type: string
     type: object
+  models.CareerCertification:
+    properties:
+      created_at:
+        type: string
+      credential_id:
+        type: string
+      credential_url:
+        type: string
+      description:
+        type: string
+      expiry_date:
+        type: string
+      file_name:
+        type: string
+      file_size:
+        type: integer
+      file_url:
+        type: string
+      id:
+        type: integer
+      issue_date:
+        type: string
+      issuer:
+        type: string
+      mime_type:
+        type: string
+      original_name:
+        type: string
+      title:
+        type: string
+      updated_at:
+        type: string
+    type: object
   utils.ErrorResponse:
     properties:
       error:
@@ -515,6 +548,167 @@ paths:
       summary: Update a project
       tags:
       - projects
+  /upload-certificates:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves all uploaded career certifications with metadata
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of certifications
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/models.CareerCertification'
+                  type: array
+              type: object
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get all certifications
+      tags:
+      - certifications
+    post:
+      consumes:
+      - multipart/form-data
+      description: Upload one or multiple certification files with optional metadata
+      parameters:
+      - description: Certification file(s)
+        in: formData
+        name: files
+        required: true
+        type: file
+      - description: 'Number of concurrent workers (default: 3, 0 = use default, max:
+          20)'
+        in: query
+        name: workers
+        type: integer
+      - description: Certification title
+        in: formData
+        name: title
+        type: string
+      - description: Issuer/Institution name
+        in: formData
+        name: issuer
+        type: string
+      - description: Issue date (DD/MM/YYYY)
+        in: formData
+        name: issue_date
+        type: string
+      - description: Expiry date (DD/MM/YYYY)
+        in: formData
+        name: expiry_date
+        type: string
+      - description: Credential ID
+        in: formData
+        name: credential_id
+        type: string
+      - description: Credential verification URL
+        in: formData
+        name: credential_url
+        type: string
+      - description: Description
+        in: formData
+        name: description
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Upload certification files
+      tags:
+      - certifications
+  /upload-certificates/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Soft deletes a certification and removes its associated file from
+        storage
+      parameters:
+      - description: Certification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Certification deleted successfully
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "400":
+          description: Invalid ID format
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Certification not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Delete a certification
+      tags:
+      - certifications
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a single certification by its ID
+      parameters:
+      - description: Certification ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Certification details
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.CareerCertification'
+              type: object
+        "400":
+          description: Invalid ID format
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "404":
+          description: Certification not found
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get certification by ID
+      tags:
+      - certifications
 schemes:
 - http
 - https

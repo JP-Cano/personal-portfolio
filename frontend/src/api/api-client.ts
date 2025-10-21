@@ -1,5 +1,5 @@
-import { ApiError } from "@/types/exceptions.ts";
 import { PORTFOLIO_BACKEND_URL } from "astro:env/server";
+import { ApiError } from "@/types/exceptions.ts";
 
 export class ApiClient {
   private static instance: ApiClient;

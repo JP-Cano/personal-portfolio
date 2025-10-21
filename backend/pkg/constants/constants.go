@@ -7,3 +7,5 @@ var (
 	ErrExperienceNotFound = errors.New("experience not found")
 	ErrProjectNotFound    = errors.New("project not found")
 )
+
+const CareerCertificationsDir = "pkg/assets/career-certifications"

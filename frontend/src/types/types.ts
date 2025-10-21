@@ -7,7 +7,7 @@ export enum WorkType {
 }
 
 export const experienceSchema = z.object({
-  id: z.uint32(),
+  id: z.number().positive(),
   title: z.string(),
   company: z.string(),
   url: z.url().optional(),
@@ -21,7 +21,7 @@ export const experienceSchema = z.object({
 });
 
 export const projectSchema = z.object({
-  id: z.uint32(),
+  id: z.number().positive(),
   name: z.string(),
   description: z.string(),
   url: z.url().optional(),
@@ -29,6 +29,65 @@ export const projectSchema = z.object({
   endDate: z.date().optional(),
   createdAt: z.date(),
   updatedAt: z.date(),
+});
+
+export const careerCertificationSchema = z.object({
+  id: z.number().positive(),
+  title: z.string(),
+  issuer: z.string(),
+  issue_date: z.date(),
+  expiry_date: z.date().optional().nullable(),
+  credential_id: z.string().optional().nullable(),
+  credential_url: z.url().optional().nullable(),
+  file_url: z.url(),
+  file_name: z.string(),
+  original_name: z.string(),
+  file_size: z.number(),
+  mime_type: z.string(),
+  description: z.string().optional(),
+  created_at: z.date(),
+  updated_at: z.date(),
+});
+
+export const certificationMetadataSchema = z.object({
+  title: z.string().max(255).optional(),
+  issuer: z.string().max(255).optional(),
+  issue_date: z.string().optional(),
+  expiry_date: z.string().optional(),
+  credential_id: z.string().max(255).optional(),
+  credential_url: z.url().max(500).optional(),
+  description: z.string().optional(),
+});
+
+export const uploadCertificatesRequestSchema = z.object({
+  workers: z.number().min(0).max(20).optional(),
+});
+
+export const uploadedFileSchema = z.object({
+  id: z.number().positive(),
+  title: z.string(),
+  issuer: z.string(),
+  issue_date: z.coerce.date(),
+  file_url: z.string().url(),
+  file_name: z.string(),
+  original_name: z.string(),
+  file_size: z.number(),
+  mime_type: z.string(),
+  created_at: z.coerce.date(),
+  updated_at: z.coerce.date(),
+});
+
+export const uploadErrorSchema = z.object({
+  original: z.string(),
+  error: z.string(),
+});
+
+export const uploadResponseSchema = z.object({
+  total: z.number(),
+  successful: z.number(),
+  failed: z.number(),
+  files: z.array(uploadedFileSchema),
+  errors: z.array(uploadErrorSchema),
 });
 
 export const experienceRequestSchema = experienceSchema.omit({
@@ -50,6 +109,13 @@ export type Experiences = Array<Experience>;
 export type Project = z.infer<typeof projectSchema>;
 export type ProjectRequest = z.infer<typeof projectRequestSchema>;
 export type Projects = Array<Project>;
+
+export type CertificationMetadata = z.infer<typeof certificationMetadataSchema>;
+export type UploadCertificatesRequest = z.infer<
+  typeof uploadCertificatesRequestSchema
+>;
+export type CareerCertifications = Array<z.infer<typeof uploadedFileSchema>>;
+export type UploadResponse = z.infer<typeof uploadResponseSchema>;
 
 /**
  * A TypeScript type that represents the result of an asynchronous operation that can either resolve with data

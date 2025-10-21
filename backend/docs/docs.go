@@ -572,6 +572,253 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/upload-certificates": {
+            "get": {
+                "description": "Retrieves all uploaded career certifications with metadata",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "certifications"
+                ],
+                "summary": "Get all certifications",
+                "responses": {
+                    "200": {
+                        "description": "List of certifications",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/models.CareerCertification"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Upload one or multiple certification files with optional metadata",
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "certifications"
+                ],
+                "summary": "Upload certification files",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Certification file(s)",
+                        "name": "files",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Number of concurrent workers (default: 3, 0 = use default, max: 20)",
+                        "name": "workers",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Certification title",
+                        "name": "title",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Issuer/Institution name",
+                        "name": "issuer",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Issue date (DD/MM/YYYY)",
+                        "name": "issue_date",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Expiry date (DD/MM/YYYY)",
+                        "name": "expiry_date",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Credential ID",
+                        "name": "credential_id",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Credential verification URL",
+                        "name": "credential_url",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Description",
+                        "name": "description",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/upload-certificates/{id}": {
+            "get": {
+                "description": "Retrieves a single certification by its ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "certifications"
+                ],
+                "summary": "Get certification by ID",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Certification ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Certification details",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/utils.SuccessResponse"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/models.CareerCertification"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID format",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Certification not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Soft deletes a certification and removes its associated file from storage",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "certifications"
+                ],
+                "summary": "Delete a certification",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Certification ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Certification deleted successfully",
+                        "schema": {
+                            "$ref": "#/definitions/utils.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid ID format",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Certification not found",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -780,6 +1027,56 @@ const docTemplate = `{
                 "url": {
                     "type": "string",
                     "maxLength": 500
+                }
+            }
+        },
+        "models.CareerCertification": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "credential_id": {
+                    "type": "string"
+                },
+                "credential_url": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "expiry_date": {
+                    "type": "string"
+                },
+                "file_name": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "integer"
+                },
+                "file_url": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "issue_date": {
+                    "type": "string"
+                },
+                "issuer": {
+                    "type": "string"
+                },
+                "mime_type": {
+                    "type": "string"
+                },
+                "original_name": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },

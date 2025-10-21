@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"reflect"
@@ -8,6 +9,7 @@ import (
 	"time"
 
 	"github.com/JuanPabloCano/personal-portfolio/backend/pkg/utils"
+	"github.com/bytedance/gopkg/util/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 )
@@ -148,6 +150,35 @@ func ValidateRequest[T any]() gin.HandlerFunc {
 	}
 }
 
+// ValidateQuery is a generic middleware that validates query parameters against validation tags
+func ValidateQuery[T any]() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var req T
+
+		// Bind query parameters
+		if err := c.ShouldBindQuery(&req); err != nil {
+			logger.Error("Failed to bind query parameters: %v", err)
+			utils.RespondWithError(c, http.StatusBadRequest, "Invalid query parameters", err)
+			c.Abort()
+			return
+		}
+
+		// Validate using validator tags
+		if err := validate.Struct(req); err != nil {
+			var validationErrors validator.ValidationErrors
+			errors.As(err, &validationErrors)
+			errorMessages := formatValidationErrors(validationErrors)
+			utils.RespondWithError(c, http.StatusBadRequest, strings.Join(errorMessages, "; "), err)
+			c.Abort()
+			return
+		}
+
+		// Store validated query in context for handler to use
+		c.Set("validatedQuery", req)
+		c.Next()
+	}
+}
+
 // formatValidationErrors converts validator errors to human-readable messages
 func formatValidationErrors(errors validator.ValidationErrors) []string {
 	var messages []string
@@ -160,9 +191,19 @@ func formatValidationErrors(errors validator.ValidationErrors) []string {
 		case "required":
 			message = fmt.Sprintf("%s is required", field)
 		case "min":
-			message = fmt.Sprintf("%s must be at least %s characters", field, err.Param())
+			// Check if it's numeric validation or string length
+			if err.Type().Kind() == reflect.Int || err.Type().Kind() == reflect.Int64 {
+				message = fmt.Sprintf("%s must be at least %s", field, err.Param())
+			} else {
+				message = fmt.Sprintf("%s must be at least %s characters", field, err.Param())
+			}
 		case "max":
-			message = fmt.Sprintf("%s must not exceed %s characters", field, err.Param())
+			// Check if it's numeric validation or string length
+			if err.Type().Kind() == reflect.Int || err.Type().Kind() == reflect.Int64 {
+				message = fmt.Sprintf("%s must not exceed %s", field, err.Param())
+			} else {
+				message = fmt.Sprintf("%s must not exceed %s characters", field, err.Param())
+			}
 		case "url":
 			message = fmt.Sprintf("%s must be a valid URL", field)
 		case "oneof":

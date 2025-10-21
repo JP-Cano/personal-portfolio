@@ -8,7 +8,7 @@ import (
 )
 
 // SetupRoutes configures all application routes
-func SetupRoutes(router *gin.Engine, experienceHandler *handlers.ExperienceHandler, projectHandler *handlers.ProjectHandler) {
+func SetupRoutes(router *gin.Engine, experienceHandler *handlers.ExperienceHandler, projectHandler *handlers.ProjectHandler, uploadCertificatesHandler *handlers.CareerCertificationHandler) {
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"status":  "ok",
@@ -24,8 +24,14 @@ func SetupRoutes(router *gin.Engine, experienceHandler *handlers.ExperienceHandl
 		{
 			experiences.GET("", experienceHandler.GetAllExperiences)
 			experiences.GET("/:id", experienceHandler.GetExperienceByID)
-			experiences.POST("", middleware.ValidateRequest[dto.ExperienceRequest](), experienceHandler.CreateExperience)
-			experiences.PATCH("/:id", middleware.ValidateRequest[dto.UpdateExperienceRequest](), experienceHandler.UpdateExperience)
+			experiences.POST("",
+				middleware.ValidateRequest[dto.ExperienceRequest](),
+				experienceHandler.CreateExperience,
+			)
+			experiences.PATCH("/:id",
+				middleware.ValidateRequest[dto.UpdateExperienceRequest](),
+				experienceHandler.UpdateExperience,
+			)
 			experiences.DELETE("/:id", experienceHandler.DeleteExperience)
 		}
 
@@ -34,9 +40,27 @@ func SetupRoutes(router *gin.Engine, experienceHandler *handlers.ExperienceHandl
 		{
 			projects.GET("", projectHandler.GetAllProjects)
 			projects.GET("/:id", projectHandler.GetProjectById)
-			projects.POST("", middleware.ValidateRequest[dto.ProjectRequest](), projectHandler.CreateProject)
-			projects.PATCH("/:id", middleware.ValidateRequest[dto.UpdateProjectRequest](), projectHandler.UpdateProject)
+			projects.POST("",
+				middleware.ValidateRequest[dto.ProjectRequest](),
+				projectHandler.CreateProject,
+			)
+			projects.PATCH("/:id",
+				middleware.ValidateRequest[dto.UpdateProjectRequest](),
+				projectHandler.UpdateProject,
+			)
 			projects.DELETE("/:id", projectHandler.DeleteProject)
+		}
+
+		// Upload Certificates
+		uploadCertificates := v1.Group("/upload-certificates")
+		{
+			uploadCertificates.GET("", uploadCertificatesHandler.GetAllCertifications)
+			uploadCertificates.GET("/:id", uploadCertificatesHandler.GetCertificationByID)
+			uploadCertificates.POST("",
+				middleware.ValidateQuery[dto.UploadCertificatesRequest](),
+				uploadCertificatesHandler.UploadAcademicCertificates,
+			)
+			uploadCertificates.DELETE("/:id", uploadCertificatesHandler.DeleteCertification)
 		}
 	}
 }
