@@ -74,8 +74,8 @@ const github = profiles.find((profile) => profile.network === "GitHub");
 
 <style>
   .site-footer {
-    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
-    color: #fff;
+    background: linear-gradient(135deg, var(--footer-grad-start) 0%, var(--footer-grad-end) 100%);
+    color: var(--footer-text);
     padding: 4rem 2rem 2rem;
     margin-top: 6rem;
   }
@@ -95,7 +95,7 @@ const github = profiles.find((profile) => profile.network === "GitHub");
   .footer-section h3 {
     font-size: 1.5rem;
     margin-bottom: 1rem;
-    background: linear-gradient(135deg, #fff 0%, #c7d2fe 100%);
+    background: linear-gradient(135deg, var(--footer-heading-grad-start) 0%, var(--footer-heading-grad-end) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -104,11 +104,11 @@ const github = profiles.find((profile) => profile.network === "GitHub");
   .footer-section h4 {
     font-size: 1.1rem;
     margin-bottom: 1rem;
-    color: #c7d2fe;
+    color: var(--footer-heading-grad-end);
   }
 
   .footer-section p {
-    color: #a5b4fc;
+    color: var(--footer-subtle);
     line-height: 1.6;
   }
 
@@ -123,13 +123,13 @@ const github = profiles.find((profile) => profile.network === "GitHub");
   }
 
   .footer-section ul li a {
-    color: #a5b4fc;
+    color: var(--footer-subtle);
     text-decoration: none;
     transition: color 0.3s ease;
   }
 
   .footer-section ul li a:hover {
-    color: #fff;
+    color: var(--footer-text);
   }
 
   .social-links {
