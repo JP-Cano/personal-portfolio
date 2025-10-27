@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+
+# Build output (will be built inside Docker)
+dist/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Development files
+.astro/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Testing
+coverage/
+
+# Misc
+README.md

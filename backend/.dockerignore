@@ -1,0 +1,37 @@
+# Ignore development files
+.env
+.env.local
+.env.*.local
+
+# Ignore build artifacts
+portfolio-api
+tmp/
+*.db
+*.db-journal
+
+# Ignore documentation
+docs/SWAGGER.md
+README.md
+
+# Ignore test files
+*_test.go
+test/
+coverage.txt
+
+# Ignore Git
+.git/
+.gitignore
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore air (dev tool)
+.air.toml

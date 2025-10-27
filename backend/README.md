@@ -5,6 +5,7 @@ A RESTful API built with Go, Gin, and SQLite for managing portfolio projects and
 ## 📋 Table of Contents
 
 - [Features](#features)
+- [Rate Limiting & Throttling](#rate-limiting--throttling)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
@@ -25,6 +26,61 @@ A RESTful API built with Go, Gin, and SQLite for managing portfolio projects and
 - ✅ Work type enum validation (Remote, On Site, Hybrid)
 - ✅ Comprehensive Makefile for development
 - ✅ Clean architecture with separation of concerns
+- ✅ IP-based rate limiting with token bucket algorithm
+
+## 🚦 Rate Limiting & Throttling
+
+The API implements a custom **IP-based throttler** using the **Token Bucket Algorithm** to protect against abuse and ensure fair resource usage.
+
+### How It Works
+
+Each client IP address gets its own "bucket" of tokens:
+- **Tokens**: Each request consumes 1 token
+- **Refill Rate**: Tokens refill continuously at a configurable rate (requests per second)
+- **Maximum Capacity**: Buckets have a maximum token limit to prevent burst abuse
+- **Automatic Cleanup**: Inactive IP buckets are removed after 10 minutes of inactivity
+
+### Token Bucket Algorithm
+
+The token bucket algorithm provides smooth rate limiting:
+
+1. **New Request Arrives**: System checks the IP's bucket for available tokens
+2. **Token Refill**: Tokens are added based on elapsed time since last request
+3. **Allow or Deny**:
+   - ✅ If tokens ≥ 1: Request allowed, subtract 1 token
+   - ❌ If tokens < 1: Request rejected with `429 Too Many Requests`
+
+### Configuration
+
+```go
+// In routes.go or main.go
+router.Use(middleware.Throttler(5)) // 5 requests per second per IP
+```
+
+### Implementation Details
+
+**Location**: `backend/internal/middleware/throttler.go:114`
+
+**Key Features**:
+- Thread-safe with read/write locks for concurrent access
+- Memory efficient with automatic cleanup of stale buckets
+- Supports burst traffic within the configured limit
+- Per-IP tracking prevents one client from affecting others
+
+**Response on Rate Limit Exceeded**:
+```json
+{
+  "error": "Too many requests"
+}
+```
+HTTP Status: `429 Too Many Requests`
+
+### Benefits
+
+- **DoS Protection**: Prevents denial-of-service attacks
+- **Fair Usage**: Ensures all clients get fair API access
+- **Resource Control**: Protects backend resources from overload
+- **Flexible**: Easy to adjust limits based on requirements
 
 ## 🛠️ Tech Stack
 

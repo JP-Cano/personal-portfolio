@@ -19,6 +19,15 @@ func SetupRoutes(router *gin.Engine, experienceHandler *handlers.ExperienceHandl
 	// API v1 routes
 	v1 := router.Group("/api/v1")
 	{
+		// Health check for API
+		v1.GET("/health", func(c *gin.Context) {
+			c.JSON(200, gin.H{
+				"status":  "ok",
+				"message": "API is running",
+				"version": "1.0",
+			})
+		})
+
 		// Experience routes
 		experiences := v1.Group("/experiences")
 		{

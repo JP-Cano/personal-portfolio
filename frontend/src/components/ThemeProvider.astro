@@ -1,0 +1,86 @@
+---
+
+---
+
+<script is:inline>
+  (function () {
+    const THEME_KEY = "theme";
+    const root = document.documentElement;
+
+    let stored;
+    try {
+      stored = localStorage.getItem(THEME_KEY);
+    } catch (_) {}
+
+    let prefersDark = false;
+    try {
+      prefersDark =
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+    } catch (_) {}
+
+    const initial = stored || (prefersDark ? "dark" : "light");
+    if (root.getAttribute("data-theme") !== initial) {
+      root.setAttribute("data-theme", initial);
+    }
+
+    let meta = document.querySelector('meta[name="color-scheme"]');
+    if (!meta) {
+      meta = document.createElement("meta");
+      meta.setAttribute("name", "color-scheme");
+      document.head.appendChild(meta);
+    }
+
+    function applyColorScheme() {
+      meta.setAttribute(
+        "content",
+        root.getAttribute("data-theme") === "dark" ? "dark light" : "light dark"
+      );
+    }
+
+    applyColorScheme();
+
+    function toggle() {
+      const next =
+        root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try {
+        localStorage.setItem(THEME_KEY, next);
+      } catch (_) {}
+      applyColorScheme();
+      window.dispatchEvent(
+        new CustomEvent("theme:changed", { detail: { theme: next } })
+      );
+    }
+
+    window.addEventListener("theme:toggle", toggle);
+
+    window.addEventListener("storage", function (e) {
+      if (e.key === THEME_KEY && e.newValue) {
+        root.setAttribute("data-theme", e.newValue);
+        applyColorScheme();
+        window.dispatchEvent(
+          new CustomEvent("theme:changed", { detail: { theme: e.newValue } })
+        );
+      }
+    });
+
+    try {
+      const media = window.matchMedia("(prefers-color-scheme: dark)");
+      media.addEventListener &&
+        media.addEventListener("change", function (e) {
+          try {
+            stored = localStorage.getItem(THEME_KEY);
+          } catch (_) {}
+          if (!stored) {
+            var next = e.matches ? "dark" : "light";
+            root.setAttribute("data-theme", next);
+            applyColorScheme();
+            window.dispatchEvent(
+              new CustomEvent("theme:changed", { detail: { theme: next } })
+            );
+          }
+        });
+    } catch (_) {}
+  })();
+</script>

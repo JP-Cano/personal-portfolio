@@ -32,22 +32,6 @@ import Layout from "@/layouts/Layout.astro";
 </Layout>
 
 <script>
-  (function initTheme() {
-    const THEME_KEY = 'theme';
-    const root = document.documentElement;
-    const stored = localStorage.getItem(THEME_KEY);
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = stored || (prefersDark ? 'dark' : 'light');
-    if (!root.getAttribute('data-theme')) {
-      root.setAttribute('data-theme', initialTheme);
-    }
-    window.addEventListener('theme:toggle', () => {
-      const current = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      root.setAttribute('data-theme', current);
-      localStorage.setItem(THEME_KEY, current);
-    });
-  })();
-
   const observerOptions = {
     threshold: 0.1,
     rootMargin: "0px 0px -100px 0px",

@@ -83,6 +83,7 @@ func main() {
 	// Add custom middleware
 	r.Use(middleware.RecoveryMiddleware())
 	r.Use(middleware.LoggerMiddleware())
+	r.Use(middleware.Throttler(middleware.FiveRequestsPerMinute))
 
 	// CORS configuration
 	config := cors.DefaultConfig()

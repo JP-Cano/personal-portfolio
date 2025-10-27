@@ -1,5 +1,5 @@
 ---
-
+import ThemeToggle from "@/components/ThemeToggle.astro";
 ---
 
 <nav class="navbar">
@@ -13,7 +13,7 @@
       <li><a href="#contact" class="contact-btn">Contact</a></li>
     </ul>
     <div class="actions">
-      <button class="theme-toggle" aria-label="Toggle dark mode" title="Toggle theme"></button>
+      <ThemeToggle />
       <button class="mobile-menu-toggle" aria-label="Toggle menu">
         <span></span>
         <span></span>
@@ -45,22 +45,6 @@
   menuToggle?.addEventListener("click", () => {
     navLinks?.classList.toggle("active");
     menuToggle?.classList.toggle("active");
-  });
-
-  // Theme toggle wiring
-  const themeBtn = document.querySelector('.theme-toggle');
-  const updateThemeIcon = () => {
-    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-    themeBtn?.setAttribute('data-mode', isDark ? 'dark' : 'light');
-    themeBtn?.setAttribute('aria-pressed', String(isDark));
-  };
-  updateThemeIcon();
-  themeBtn?.addEventListener('click', () => {
-    window.dispatchEvent(new Event('theme:toggle'));
-    updateThemeIcon();
-  });
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'theme') updateThemeIcon();
   });
 
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
@@ -143,36 +127,6 @@
     gap: 0.75rem;
   }
 
-  .theme-toggle {
-    width: 40px;
-    height: 40px;
-    border-radius: 999px;
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-text);
-    transition: var(--transition);
-  }
-  .theme-toggle:hover {
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    transform: translateY(-1px);
-  }
-  .theme-toggle::before {
-    content: attr(data-mode);
-    position: absolute;
-    width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0);
-  }
-  .theme-toggle::after {
-    content: '☀︎';
-    font-size: 1.1rem;
-    line-height: 1;
-  }
-  .theme-toggle[data-mode="dark"]::after {
-    content: '🌙';
-  }
-
   .nav-links a {
     color: var(--color-text-light);
     text-decoration: none;
@@ -202,7 +156,11 @@
   }
 
   .contact-btn {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-secondary) 100%
+    );
     color: white !important;
     padding: 0.6rem 1.5rem;
     border-radius: 50px;
