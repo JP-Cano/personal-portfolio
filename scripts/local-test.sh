@@ -88,7 +88,7 @@ info "Container status:"
 docker compose ps
 
 echo ""
-success "🎉 All tests passed!"
+success "All tests passed!"
 echo ""
 info "Your application is running:"
 echo "  Frontend: http://localhost:3000"
