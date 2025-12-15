@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	_ "github.com/JuanPabloCano/personal-portfolio/backend/docs"
 	"github.com/JuanPabloCano/personal-portfolio/backend/internal/handlers"
@@ -29,7 +30,7 @@ import (
 // @BasePath /api/v1
 // @schemes http https
 func main() {
-	if err := godotenv.Load(); err != nil {
+	if err := godotenv.Load("../.env"); err != nil {
 		logger.Info("No .env file found, using environment variables")
 	}
 	logLevel := logger.INFO
@@ -83,11 +84,17 @@ func main() {
 	// Add custom middleware
 	r.Use(middleware.RecoveryMiddleware())
 	r.Use(middleware.LoggerMiddleware())
-	r.Use(middleware.Throttler(middleware.FiveRequestsPerMinute))
+	r.Use(middleware.Throttler(middleware.MaxRequestsPerSecond))
 
 	// CORS configuration
+	origins := os.Getenv("ALLOWED_ORIGINS")
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000"}
+	config.AllowOrigins = strings.Split(origins, ",")
+
+	for _, origin := range config.AllowOrigins {
+		logger.Debug("Allowed origin: %s", origin)
+	}
+
 	r.Use(cors.New(config))
 
 	r.Static("/certifications", constants.CareerCertificationsDir)
@@ -102,7 +109,7 @@ func main() {
 		careerCertificationHandler,
 	)
 
-	port := os.Getenv("PORT")
+	port := os.Getenv("SERVER_PORT")
 	if port == "" {
 		port = "8080"
 	}

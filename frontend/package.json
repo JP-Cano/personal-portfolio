@@ -14,13 +14,13 @@
   },
   "dependencies": {
     "@types/three": "^0.180.0",
-    "astro": "^5.14.3",
+    "astro": "^5.16.5",
     "glightbox": "^3.3.1",
     "three": "^0.180.0",
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@astrojs/node": "^9.5.0",
+    "@astrojs/node": "^9.5.1",
     "@eslint/js": "^9.37.0",
     "@typescript-eslint/parser": "^8.46.0",
     "eslint": "^9.37.0",

@@ -15,7 +15,7 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build the application
+# Build the application (no backend URL needed at build time for SSR)
 RUN pnpm run build
 
 # ============================================
@@ -37,8 +37,8 @@ RUN pnpm install --prod --frozen-lockfile
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
 
-# Expose port
-EXPOSE 4321
+# Expose port (documentation only - actual port set by PORT env var)
+EXPOSE 3000
 
 # Start the application
 CMD ["node", "./dist/server/entry.mjs"]

@@ -9,8 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const FiveRequestsPerMinute = 5
-const TenMinutesThreshold = 10
+const MaxRequestsPerSecond = 10 // Allow 10 requests per second
+const TenMinutesThreshold = 10  // Cleanup inactive buckets after 10 minutes
 
 // Token Bucket Algorithm
 // Each IP address has a bucket that holds tokens. Each request costs 1 token, and tokens refill continuously over time.
@@ -23,15 +23,17 @@ type bucket struct {
 type IpThrottler struct {
 	buckets    map[string]*bucket
 	mu         sync.RWMutex
-	maxTokens  float64
-	refillRate float64
+	maxTokens  float64 // Burst capacity (bucket size)
+	refillRate float64 // Tokens per second
 }
 
 // NewIpThrottler initializes and returns a new IpThrottler with the specified maximum requests per second.
+// maxRequests: refill rate (tokens per second)
+// The burst capacity is set to 2x the refill rate to allow initial bursts
 func NewIpThrottler(maxRequests int) *IpThrottler {
 	throttler := &IpThrottler{
 		buckets:    make(map[string]*bucket),
-		maxTokens:  float64(maxRequests),
+		maxTokens:  float64(maxRequests * 2), // 2x burst capacity
 		refillRate: float64(maxRequests),
 	}
 
@@ -41,7 +43,7 @@ func NewIpThrottler(maxRequests int) *IpThrottler {
 
 // cleanup removes inactive buckets from the IpThrottler's map if they have not been accessed within the last 10 minutes.
 func (t *IpThrottler) cleanup() {
-	ticker := time.NewTicker(FiveRequestsPerMinute * time.Minute)
+	ticker := time.NewTicker(5 * time.Minute) // Run cleanup every 5 minutes
 	defer ticker.Stop()
 
 	for range ticker.C {

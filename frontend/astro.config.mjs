@@ -24,13 +24,18 @@ export default defineConfig({
       PORTFOLIO_BACKEND_URL: envField.string({
         context: "server",
         access: "secret",
+        default: "http://localhost:8080/api/v1",
       }),
       PORT: envField.number({
         context: "server",
         access: "public",
         default: DEFAULT_PORT,
       }),
-      ENVIRONMENT: envField.string({ context: "server", access: "public" }),
+      ENVIRONMENT: envField.string({
+        context: "server",
+        access: "public",
+        default: "development",
+      }),
     },
   },
 

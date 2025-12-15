@@ -29,6 +29,8 @@ export class ApiClient {
   async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const url = `${PORTFOLIO_BACKEND_URL}/${endpoint}`;
 
+    console.log(`Sending request to ${url}`);
+
     const response = await fetch(url, {
       ...options,
       credentials: "include",

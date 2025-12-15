@@ -3,6 +3,9 @@
 .env.local
 .env.*.local
 
+# Docker Compose override (optional - keep for local dev)
+docker-compose.override.yml
+
 # Backend
 backend/portfolio-api
 backend/*.db

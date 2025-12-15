@@ -6,6 +6,9 @@ FROM golang:1.25-alpine AS builder
 # Install build dependencies
 RUN apk add --no-cache git gcc musl-dev sqlite-dev
 
+# Install make command
+RUN apk update && apk add make
+
 WORKDIR /app
 
 # Copy go mod files
@@ -16,8 +19,8 @@ RUN go mod download
 COPY . .
 
 # Generate swagger docs
-RUN go install github.com/swaggo/swag/cmd/swag@latest
-RUN swag init -g cmd/api/main.go -o docs
+RUN make swagger-install
+RUN make swagger
 
 # Build the application
 RUN CGO_ENABLED=1 GOOS=linux go build -a -installsuffix cgo -o portfolio-api cmd/api/main.go

@@ -13,6 +13,8 @@ const [certifications, error] = await asyncThrowable<CareerCertifications>(() =>
 );
 
 const hasError = error !== null;
+
+console.log(error);
 ---
 
 <Section title="Certifications" id="certifications">
