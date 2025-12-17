@@ -77,13 +77,13 @@ EOF
 success "Temporary nginx config created"
 
 # ============================================
-# 2. Start nginx (without certbot initially)
+# 2. Restart nginx with temporary config
 # ============================================
-info "Starting nginx..."
+info "Restarting nginx with temporary config..."
 cd /opt/portfolio
-docker compose up -d nginx
+docker compose restart nginx
 sleep 5
-success "Nginx started"
+success "Nginx restarted"
 
 # ============================================
 # 3. Obtain SSL certificate
