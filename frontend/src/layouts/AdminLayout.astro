@@ -1,0 +1,222 @@
+---
+import type { User } from "@/types/auth";
+import "@/styles/admin.css";
+
+interface Props {
+  title: string;
+  currentPath?: string;
+  user?: User | null;
+}
+
+const { title, currentPath = "", user } = Astro.props;
+
+const navLinks = [
+  { href: "/admin", label: "Dashboard", icon: "home" },
+  { href: "/admin/experiences", label: "Experiences", icon: "briefcase" },
+  { href: "/admin/projects", label: "Projects", icon: "folder" },
+  { href: "/admin/certifications", label: "Certifications", icon: "award" },
+];
+
+const isActive = (href: string) => {
+  if (href === "/admin") {
+    return currentPath === "/admin" || currentPath === "/admin/";
+  }
+  return currentPath.startsWith(href);
+};
+
+const getInitial = (email?: string) => {
+  return email ? email.charAt(0).toUpperCase() : "A";
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{title} | Admin</title>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="admin-root">
+      <aside class="admin-sidebar">
+        <div class="admin-sidebar-header">
+          <a href="/admin" class="admin-sidebar-logo">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+              <path d="M2 17l10 5 10-5"></path>
+              <path d="M2 12l10 5 10-5"></path>
+            </svg>
+            <span>Portfolio Admin</span>
+          </a>
+        </div>
+
+        <nav class="admin-sidebar-nav">
+          <div class="admin-nav-section">
+            <div class="admin-nav-section-title">Menu</div>
+            {
+              navLinks.map((link) => (
+                <a
+                  href={link.href}
+                  class:list={[
+                    "admin-nav-link",
+                    { active: isActive(link.href) },
+                  ]}
+                >
+                  {link.icon === "home" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                      <polyline points="9 22 9 12 15 12 15 22" />
+                    </svg>
+                  )}
+                  {link.icon === "briefcase" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+                      <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+                    </svg>
+                  )}
+                  {link.icon === "folder" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+                    </svg>
+                  )}
+                  {link.icon === "award" && (
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="8" r="7" />
+                      <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88" />
+                    </svg>
+                  )}
+                  {link.label}
+                </a>
+              ))
+            }
+          </div>
+
+          <div class="admin-nav-section">
+            <div class="admin-nav-section-title">External</div>
+            <a
+              href="/"
+              class="admin-nav-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+                ></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              View Portfolio
+            </a>
+          </div>
+        </nav>
+
+        {
+          user && (
+            <div class="admin-sidebar-footer">
+              <div class="admin-user-info">
+                <div class="admin-user-avatar">{getInitial(user.email)}</div>
+                <span class="admin-user-email">{user.email}</span>
+              </div>
+              <form method="POST" action="/admin/logout">
+                <button
+                  type="submit"
+                  class="admin-btn admin-btn-ghost"
+                  style="width: 100%;"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                  </svg>
+                  Logout
+                </button>
+              </form>
+            </div>
+          )
+        }
+      </aside>
+
+      <main class="admin-main">
+        <header class="admin-header">
+          <h1 class="admin-header-title">{title}</h1>
+        </header>
+
+        <div class="admin-content">
+          <slot />
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

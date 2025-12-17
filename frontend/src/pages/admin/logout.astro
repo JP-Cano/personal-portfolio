@@ -1,0 +1,19 @@
+---
+export const prerender = false;
+
+import { api } from "@/api/api-client";
+
+if (Astro.request.method === "POST") {
+  const cookie = Astro.request.headers.get("cookie") || "";
+
+  try {
+    await api.logout(cookie);
+  } catch {
+    // Ignore logout errors
+  }
+
+  return Astro.redirect("/admin/login");
+}
+
+return Astro.redirect("/admin");
+---

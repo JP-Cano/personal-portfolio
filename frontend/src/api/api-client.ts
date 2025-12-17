@@ -1,4 +1,5 @@
 import { PORTFOLIO_BACKEND_URL } from "astro:env/server";
+import type { AuthResponse, LoginRequest, User } from "@/types/auth";
 import { ApiError } from "@/types/exceptions.ts";
 
 export class ApiClient {
@@ -49,13 +50,63 @@ export class ApiClient {
   }
 
   /**
+   * Login with email and password.
+   * The backend will set an HttpOnly cookie with the session ID.
+   */
+  async login(credentials: LoginRequest): Promise<AuthResponse> {
+    return this.post<AuthResponse>("auth/login", credentials);
+  }
+
+  /**
+   * Get current authenticated user.
+   * Returns user data if session is valid, throws if not authenticated.
+   * @param cookie - Optional cookie header for SSR requests
+   */
+  async getCurrentUser(cookie?: string): Promise<User> {
+    const headers: HeadersInit = {};
+    if (cookie) {
+      headers["Cookie"] = cookie;
+    }
+    return this.request<User>("auth/me", { headers });
+  }
+
+  /**
+   * Logout the current user.
+   * The backend will clear the session cookie.
+   * @param cookie - Optional cookie header for SSR requests
+   */
+  async logout(cookie?: string): Promise<void> {
+    const headers: HeadersInit = {};
+    if (cookie) {
+      headers["Cookie"] = cookie;
+    }
+    await this.request<{ message: string }>("auth/logout", {
+      method: "POST",
+      headers,
+    });
+  }
+
+  /**
+   * Builds headers object with optional cookie for SSR requests.
+   * @param cookie - Optional cookie header for SSR requests
+   */
+  private buildHeaders(cookie?: string): HeadersInit {
+    const headers: HeadersInit = {};
+    if (cookie) {
+      headers["Cookie"] = cookie;
+    }
+    return headers;
+  }
+
+  /**
    * Sends a GET request to the specified endpoint and returns the parsed response.
    *
    * @param {string} endpoint - The endpoint URL to send the GET request to.
+   * @param {string} [cookie] - Optional cookie header for SSR requests.
    * @return {Promise<T>} A promise that resolves to the response of the specified type.
    */
-  async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint);
+  async get<T>(endpoint: string, cookie?: string): Promise<T> {
+    return this.request<T>(endpoint, { headers: this.buildHeaders(cookie) });
   }
 
   /**
@@ -63,12 +114,14 @@ export class ApiClient {
    *
    * @param {string} endpoint - The endpoint to which the POST request is sent.
    * @param {unknown} data - The data to include in the body of the POST request.
+   * @param {string} [cookie] - Optional cookie header for SSR requests.
    * @return {Promise<T>} A promise that resolves to the response of the request as the specified type.
    */
-  async post<T>(endpoint: string, data: unknown): Promise<T> {
+  async post<T>(endpoint: string, data: unknown, cookie?: string): Promise<T> {
     return this.request<T>(endpoint, {
       method: "POST",
       body: JSON.stringify(data),
+      headers: this.buildHeaders(cookie),
     });
   }
 
@@ -77,12 +130,14 @@ export class ApiClient {
    *
    * @param {string} endpoint The API endpoint to which the PATCH request will be sent.
    * @param {unknown} data The data to be sent in the body of the PATCH request.
+   * @param {string} [cookie] - Optional cookie header for SSR requests.
    * @return {Promise<T>} A promise that resolves to the server's response data of type T.
    */
-  async patch<T>(endpoint: string, data: unknown): Promise<T> {
+  async patch<T>(endpoint: string, data: unknown, cookie?: string): Promise<T> {
     return this.request<T>(endpoint, {
       method: "PATCH",
       body: JSON.stringify(data),
+      headers: this.buildHeaders(cookie),
     });
   }
 
@@ -90,12 +145,46 @@ export class ApiClient {
    * Sends a DELETE request to the specified endpoint.
    *
    * @param {string} endpoint - The API endpoint to send the DELETE request to.
+   * @param {string} [cookie] - Optional cookie header for SSR requests.
    * @return {Promise<T>} A promise that resolves with the response data of type T.
    */
-  async delete<T>(endpoint: string): Promise<T> {
+  async delete<T>(endpoint: string, cookie?: string): Promise<T> {
     return this.request<T>(endpoint, {
       method: "DELETE",
+      headers: this.buildHeaders(cookie),
     });
+  }
+
+  /**
+   * Sends a POST request with FormData (for file uploads).
+   *
+   * @param {string} endpoint - The endpoint to which the POST request is sent.
+   * @param {FormData} formData - The form data to send.
+   * @param {string} [cookie] - Optional cookie header for SSR requests.
+   * @return {Promise<T>} A promise that resolves to the response of the request.
+   */
+  async postFormData<T>(
+    endpoint: string,
+    formData: FormData,
+    cookie?: string
+  ): Promise<T> {
+    const url = `${PORTFOLIO_BACKEND_URL}/${endpoint}`;
+    const headers: HeadersInit = this.buildHeaders(cookie);
+
+    const response = await fetch(url, {
+      method: "POST",
+      body: formData,
+      headers,
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new ApiError(error.message || error.error, response.status);
+    }
+
+    const result = await response.json();
+    return result.data;
   }
 }
 

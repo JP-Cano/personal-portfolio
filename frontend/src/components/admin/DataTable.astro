@@ -1,0 +1,76 @@
+---
+interface Column {
+  key: string;
+  header: string;
+  width?: string;
+}
+
+interface Props {
+  columns: Column[];
+  emptyMessage?: string;
+  showActions?: boolean;
+}
+
+const {
+  columns,
+  emptyMessage = "No items found",
+  showActions = true,
+} = Astro.props;
+---
+
+<div class="admin-table-container">
+  <table class="admin-table" data-table>
+    <thead>
+      <tr>
+        {
+          columns.map((col) => (
+            <th style={col.width ? `width: ${col.width}` : undefined}>
+              {col.header}
+            </th>
+          ))
+        }
+        {showActions && <th style="width: 120px">Actions</th>}
+      </tr>
+    </thead>
+    <tbody data-table-body>
+      <slot />
+    </tbody>
+  </table>
+  <div class="admin-empty-state" data-empty-state hidden>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="48"
+      height="48"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"
+      ></path>
+      <polyline points="13 2 13 9 20 9"></polyline>
+    </svg>
+    <p>{emptyMessage}</p>
+  </div>
+</div>
+
+<script>
+  function checkTableEmpty() {
+    document.querySelectorAll("[data-table]").forEach((table) => {
+      const tbody = table.querySelector("[data-table-body]");
+      const emptyState =
+        table.parentElement?.querySelector("[data-empty-state]");
+
+      if (tbody && emptyState) {
+        const isEmpty = tbody.children.length === 0;
+        (table as HTMLElement).hidden = isEmpty;
+        (emptyState as HTMLElement).hidden = !isEmpty;
+      }
+    });
+  }
+
+  checkTableEmpty();
+  document.addEventListener("astro:after-swap", checkTableEmpty);
+</script>

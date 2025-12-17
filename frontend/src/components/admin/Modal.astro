@@ -1,0 +1,121 @@
+---
+interface Props {
+  id: string;
+  title: string;
+}
+
+const { id, title } = Astro.props;
+---
+
+<div id={id} class="admin-modal-overlay" data-modal style="display: none;">
+  <div class="admin-modal">
+    <div class="admin-modal-header">
+      <h2 class="admin-modal-title">{title}</h2>
+      <button
+        type="button"
+        class="admin-modal-close"
+        data-modal-close
+        aria-label="Close modal"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="admin-modal-body">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<script>
+  // Prevent multiple initializations
+  if (!(window as any).__modalsInitialized) {
+    (window as any).__modalsInitialized = true;
+
+    function closeModal(modalEl: HTMLElement) {
+      modalEl.style.display = "none";
+      document.body.style.overflow = "";
+    }
+
+    function openModalEl(modalEl: HTMLElement) {
+      modalEl.style.display = "flex";
+      document.body.style.overflow = "hidden";
+    }
+
+    function initModals() {
+      document.querySelectorAll("[data-modal]").forEach((modal) => {
+        const modalEl = modal as HTMLElement;
+
+        // Skip if already initialized
+        if (modalEl.dataset.initialized) return;
+        modalEl.dataset.initialized = "true";
+
+        const closeBtn = modalEl.querySelector("[data-modal-close]");
+
+        closeBtn?.addEventListener("click", () => closeModal(modalEl));
+
+        modalEl.addEventListener("click", (e) => {
+          if (e.target === modalEl) {
+            closeModal(modalEl);
+          }
+        });
+      });
+    }
+
+    // Global modal functions
+    (window as any).openModal = (id: string) => {
+      const modal = document.getElementById(id);
+      if (modal) {
+        openModalEl(modal);
+      }
+    };
+
+    (window as any).closeModal = (id: string) => {
+      const modal = document.getElementById(id);
+      if (modal) {
+        closeModal(modal);
+      }
+    };
+
+    // Escape key handler (only add once)
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        document
+          .querySelectorAll<HTMLElement>("[data-modal]")
+          .forEach((modal) => {
+            if (modal.style.display !== "none") {
+              closeModal(modal);
+            }
+          });
+      }
+    });
+
+    // Initialize on load
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initModals);
+    } else {
+      initModals();
+    }
+
+    // Re-initialize after Astro navigation
+    document.addEventListener("astro:after-swap", () => {
+      // Reset initialized state for new modals
+      document.querySelectorAll("[data-modal]").forEach((modal) => {
+        delete (modal as HTMLElement).dataset.initialized;
+      });
+      initModals();
+    });
+  }
+</script>
