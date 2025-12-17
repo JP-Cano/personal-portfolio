@@ -206,13 +206,12 @@ sed -i "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" /opt/portfolio/nginx/conf.d/default.conf
 success "Production nginx config created"
 
 # ============================================
-# 5. Restart all services
+# 5. Restart nginx to apply SSL configuration
 # ============================================
-info "Restarting all services..."
-docker compose down
-docker compose up -d
+info "Restarting nginx with SSL configuration..."
+docker compose restart nginx
 
-success "All services restarted with SSL!"
+success "Nginx restarted with SSL!"
 
 # ============================================
 # 6. Display summary
