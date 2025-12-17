@@ -105,100 +105,57 @@ success "SSL certificate obtained!"
 # ============================================
 info "Creating production nginx configuration..."
 
-cat > /opt/portfolio/nginx/conf.d/default.conf << 'EOF'
-# HTTP server - redirects to HTTPS
+cat > /opt/portfolio/nginx/conf.d/default.conf << 'EOFCONFIG'
 server {
     listen 80;
     server_name DOMAIN_PLACEHOLDER www.DOMAIN_PLACEHOLDER;
 
-    # Let's Encrypt challenge
     location /.well-known/acme-challenge/ {
         root /var/www/certbot;
     }
 
-    # Health check endpoint (no redirect)
-    location /health {
-        access_log off;
-        return 200 "healthy\n";
-        add_header Content-Type text/plain;
-    }
-
-    # Redirect all other HTTP traffic to HTTPS
     location / {
         return 301 https://$host$request_uri;
     }
 }
 
-# HTTPS server
 server {
     listen 443 ssl http2;
     server_name DOMAIN_PLACEHOLDER www.DOMAIN_PLACEHOLDER;
 
-    # SSL certificate files (Let's Encrypt)
     ssl_certificate /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/privkey.pem;
 
-    # SSL configuration
     ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers HIGH:!aNULL:!MD5;
     ssl_prefer_server_ciphers on;
-    ssl_session_cache shared:SSL:10m;
-    ssl_session_timeout 10m;
 
-    # Security headers
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-    add_header X-Frame-Options "SAMEORIGIN" always;
-    add_header X-Content-Type-Options "nosniff" always;
-    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Strict-Transport-Security "max-age=31536000" always;
 
-    # API Backend proxy
     location /api/ {
         proxy_pass http://backend:8080;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-        proxy_read_timeout 90;
     }
 
-    # Swagger documentation
     location /swagger/ {
         proxy_pass http://backend:8080;
-        proxy_http_version 1.1;
         proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Static files for certifications
     location /certifications/ {
         proxy_pass http://backend:8080;
-        proxy_http_version 1.1;
         proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
-    # Frontend (Astro) - proxy everything else
     location / {
-        proxy_pass http://frontend:4321;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
+        proxy_pass http://frontend:3000;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
     }
 }
-EOF
+EOFCONFIG
 
 # Replace domain placeholder
 sed -i "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" /opt/portfolio/nginx/conf.d/default.conf
@@ -217,7 +174,7 @@ success "Nginx restarted with SSL!"
 # 6. Display summary
 # ============================================
 echo ""
-success "🎉 SSL setup completed!"
+success "SSL setup completed!"
 echo ""
 info "Your site is now accessible at:"
 echo "  https://$DOMAIN"
@@ -225,4 +182,4 @@ echo "  https://www.$DOMAIN"
 echo ""
 info "SSL certificate will auto-renew via certbot container"
 echo ""
-success "Deployment complete! 🚀"
+success "Deployment complete!"

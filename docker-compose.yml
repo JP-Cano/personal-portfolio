@@ -1,5 +1,6 @@
 services:
   backend:
+    image: ghcr.io/jp-cano/personal-portfolio-backend:latest
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -31,6 +32,7 @@ services:
         max-file: "3"
 
   frontend:
+    image: ghcr.io/jp-cano/personal-portfolio-frontend:latest
     build:
       context: ./frontend
       dockerfile: Dockerfile
