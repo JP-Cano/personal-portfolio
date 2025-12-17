@@ -89,7 +89,12 @@ success "Nginx restarted"
 # 3. Obtain SSL certificate
 # ============================================
 info "Obtaining SSL certificate from Let's Encrypt..."
-docker compose run --rm certbot certonly \
+docker run --rm \
+    --name certbot-manual \
+    -v "$(pwd)/certbot/www:/var/www/certbot:rw" \
+    -v "$(pwd)/certbot/conf:/etc/letsencrypt:rw" \
+    certbot/certbot:latest \
+    certonly \
     --webroot \
     --webroot-path=/var/www/certbot \
     --email "$SSL_EMAIL" \
@@ -105,7 +110,7 @@ success "SSL certificate obtained!"
 # ============================================
 info "Creating production nginx configuration..."
 
-cat > /opt/portfolio/nginx/conf.d/default.conf << 'EOFCONFIG'
+cat > nginx/conf.d/default.conf << 'EOFCONFIG'
 server {
     listen 80;
     server_name DOMAIN_PLACEHOLDER www.DOMAIN_PLACEHOLDER;
@@ -158,7 +163,7 @@ server {
 EOFCONFIG
 
 # Replace domain placeholder
-sed -i "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" /opt/portfolio/nginx/conf.d/default.conf
+sed -i "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" nginx/conf.d/default.conf
 
 success "Production nginx config created"
 
