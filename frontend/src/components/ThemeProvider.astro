@@ -73,7 +73,7 @@
             stored = localStorage.getItem(THEME_KEY);
           } catch (_) {}
           if (!stored) {
-            var next = e.matches ? "dark" : "light";
+            const next = e.matches ? "dark" : "light";
             root.setAttribute("data-theme", next);
             applyColorScheme();
             window.dispatchEvent(

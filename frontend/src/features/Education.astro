@@ -7,7 +7,7 @@ import Section from "@/components/Section.astro";
   <div class="education-grid">
     {
       education.map(
-        ({ institution, startDate, endDate, area, studyType }, index) => {
+        ({ institution, startDate, endDate, area, studyType, url }, index) => {
           const startYear = new Date(startDate).getFullYear();
           const endYear =
             endDate != null ? new Date(endDate).getFullYear() : "Present";
@@ -20,7 +20,15 @@ import Section from "@/components/Section.astro";
             >
               <div class="card-icon">🎓</div>
               <div class="card-content">
-                <h3 class="institution-name">{institution}</h3>
+                <h3 class="institution-name">
+                  {url ? (
+                    <a href={url} target="_blank" rel="noopener noreferrer">
+                      {institution}
+                    </a>
+                  ) : (
+                    institution
+                  )}
+                </h3>
                 <p class="degree-area">
                   {studyType ? `${studyType} in ` : ""}
                   {area}
@@ -49,6 +57,8 @@ import Section from "@/components/Section.astro";
 
   .education-card {
     position: relative;
+    display: flex;
+    flex-direction: column;
     background: var(--color-surface);
     border-radius: 16px;
     padding: 2rem;
@@ -100,6 +110,9 @@ import Section from "@/components/Section.astro";
   .card-content {
     position: relative;
     z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
   }
 
   .institution-name {
@@ -120,6 +133,7 @@ import Section from "@/components/Section.astro";
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-top: auto;
   }
 
   .year-badge {
