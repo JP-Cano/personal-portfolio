@@ -1,9 +1,15 @@
 ---
+import logoDark from "@/assets/logos/logo-dark-mode.webp";
+import logoLight from "@/assets/logos/logo-white-mode.webp";
 import ThemeToggle from "@/components/ThemeToggle.astro";
 ---
 
 <nav class="navbar">
   <div class="nav-container">
+    <a href="#hero" class="nav-logo">
+      <img src={logoLight.src} alt="Logo" class="logo logo-light" />
+      <img src={logoDark.src} alt="Logo" class="logo logo-dark" />
+    </a>
     <ul class="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#experience">Experience</a></li>
@@ -90,6 +96,39 @@ import ThemeToggle from "@/components/ThemeToggle.astro";
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .nav-logo {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    transition: transform 0.3s ease;
+  }
+
+  .nav-logo:hover {
+    transform: scale(1.05);
+  }
+
+  .nav-logo .logo {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .nav-logo .logo-light {
+    display: block;
+  }
+
+  .nav-logo .logo-dark {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"]) .nav-logo .logo-light {
+    display: none;
+  }
+
+  :global(:root[data-theme="dark"]) .nav-logo .logo-dark {
+    display: block;
   }
 
   .nav-links {
@@ -189,6 +228,14 @@ import ThemeToggle from "@/components/ThemeToggle.astro";
   @media (width <= 768px) {
     .mobile-menu-toggle {
       display: flex;
+    }
+
+    .nav-logo {
+      height: 32px;
+    }
+
+    .nav-logo .logo {
+      height: 32px;
     }
 
     .nav-links {
