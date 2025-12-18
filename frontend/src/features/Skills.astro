@@ -215,6 +215,26 @@ const skillCategories = [
     transition: transform 0.3s ease;
   }
 
+  .skill-icon :global(svg) {
+    color: var(--color-icon);
+    transition: color 0.3s ease, fill 0.3s ease, stroke 0.3s ease;
+  }
+
+  .skill-icon :global(svg path),
+  .skill-icon :global(svg g),
+  .skill-icon :global(svg circle),
+  .skill-icon :global(svg rect),
+  .skill-icon :global(svg polygon) {
+    fill: var(--color-icon);
+    stroke: var(--color-icon);
+  }
+
+  .skill-icon :global(svg[fill="none"] path),
+  .skill-icon :global(svg[fill="none"] circle),
+  .skill-icon :global(svg[fill="none"] rect) {
+    fill: none;
+  }
+
   .skill-item:hover .skill-icon {
     transform: scale(1.2) rotate(5deg);
   }

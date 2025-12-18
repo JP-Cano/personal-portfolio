@@ -300,7 +300,31 @@ const SOCIAL_MEDIA_ICONS: Record<string, any> = {
     }
 
     .hero-visual {
-      height: 300px;
+      height: auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .floating-card {
+      position: relative;
+      top: auto;
+      right: auto;
+      bottom: auto;
+      left: auto;
+    }
+
+    .card-1 {
+      animation: float 3s ease infinite;
+    }
+
+    .card-2 {
+      animation: float 3s ease infinite 1s;
+    }
+
+    .card-3 {
+      animation: float 3s ease infinite 0.5s;
     }
 
     .scroll-indicator {
@@ -327,6 +351,10 @@ const SOCIAL_MEDIA_ICONS: Record<string, any> = {
 
     .floating-card {
       padding: 1rem 1.5rem;
+    }
+
+    .card-icon {
+      font-size: 1.5rem;
     }
 
     .card-text {
