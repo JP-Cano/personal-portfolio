@@ -3,20 +3,25 @@ export const prerender = false;
 
 import { api } from "@/api/api-client";
 import "@/styles/admin.css";
+import type { AuthResponse } from "@/types/auth.ts";
+import { asyncThrowable } from "@/utils/utils.ts";
 
 let error: string | null = null;
 
 if (Astro.request.method === "POST") {
-  try {
-    const formData = await Astro.request.formData();
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+  const formData = await Astro.request.formData();
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
-    await api.login({ email, password });
-    return Astro.redirect("/admin");
-  } catch (err) {
+  const [_, err] = await asyncThrowable<AuthResponse>(() =>
+    api.login({ email, password })
+  );
+
+  if (err) {
     error = err instanceof Error ? err.message : "Login failed";
   }
+
+  return Astro.redirect("/admin");
 }
 ---
 

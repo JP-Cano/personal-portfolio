@@ -1,5 +1,7 @@
 import { defineMiddleware } from "astro:middleware";
 import { api } from "@/api/api-client";
+import type { User } from "@/types/auth.ts";
+import { asyncThrowable } from "@/utils/utils.ts";
 
 const PUBLIC_ADMIN_ROUTES = new Set(["/admin/login"]);
 
@@ -21,10 +23,15 @@ export const onRequest = defineMiddleware(async (context, next) => {
     }
   }
 
-  try {
-    context.locals.user = await api.getCurrentUser(cookie);
-    return next();
-  } catch {
+  const [user, error] = await asyncThrowable<User>(() =>
+    api.getCurrentUser(cookie)
+  );
+
+  if (error) {
     return context.redirect("/admin/login");
   }
+
+  context.locals.user = user as User;
+
+  return next();
 });

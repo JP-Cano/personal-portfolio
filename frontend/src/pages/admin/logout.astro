@@ -2,14 +2,15 @@
 export const prerender = false;
 
 import { api } from "@/api/api-client";
+import { asyncThrowable } from "@/utils/utils.ts";
 
 if (Astro.request.method === "POST") {
   const cookie = Astro.request.headers.get("cookie") || "";
 
-  try {
-    await api.logout(cookie);
-  } catch {
-    // Ignore logout errors
+  const [_, error] = await asyncThrowable(() => api.logout(cookie));
+
+  if (error) {
+    console.error({ error });
   }
 
   return Astro.redirect("/admin/login");

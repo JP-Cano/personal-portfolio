@@ -9,36 +9,31 @@ import type {
   CareerCertifications,
 } from "@/types/types";
 import { API_PATHS } from "@/utils/constants";
+import { asyncThrowable } from "@/utils/utils.ts";
 
 const user = Astro.locals.user;
 
-// Fetch counts for dashboard stats
-let experienceCount = 0;
-let projectCount = 0;
-let certificationCount = 0;
+const [experiences, experiencesError] = await asyncThrowable<Experiences>(() =>
+  api.get<Experiences>(API_PATHS.EXPERIENCES)
+);
+console.error({ experiencesError });
 
-try {
-  const experiences = await api.get<Experiences>(API_PATHS.EXPERIENCES);
-  experienceCount = experiences?.length ?? 0;
-} catch {
-  // Ignore error
-}
+const experienceCount = experiences?.length ?? 0;
 
-try {
-  const projects = await api.get<Projects>(API_PATHS.PROJECTS);
-  projectCount = projects?.length ?? 0;
-} catch {
-  // Ignore error
-}
+const [projects, projectsError] = await asyncThrowable<Projects>(() =>
+  api.get<Projects>(API_PATHS.PROJECTS)
+);
+console.error({ projectsError });
 
-try {
-  const certifications = await api.get<CareerCertifications>(
-    API_PATHS.UPLOAD_CERTIFICATES
+const projectCount = projects?.length ?? 0;
+
+const [certifications, certificationsError] =
+  await asyncThrowable<CareerCertifications>(() =>
+    api.get<CareerCertifications>(API_PATHS.UPLOAD_CERTIFICATES)
   );
-  certificationCount = certifications?.length ?? 0;
-} catch {
-  // Ignore error
-}
+console.error({ certificationsError });
+
+const certificationCount = certifications?.length ?? 0;
 ---
 
 <AdminLayout title="Dashboard" currentPath="/admin" user={user}>
