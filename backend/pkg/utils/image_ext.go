@@ -5,6 +5,6 @@ var (
 		".jpg":  true,
 		".jpeg": true,
 		".png":  true,
-		".pdf":  true,
+		".webp": true,
 	}
 )

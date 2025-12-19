@@ -6,17 +6,17 @@ import Modal from "@/components/admin/Modal.astro";
 import AdminLayout from "@/layouts/AdminLayout.astro";
 import type { CareerCertifications } from "@/types/types";
 import { API_PATHS } from "@/utils/constants";
+import { asyncThrowable } from "@/utils/utils.ts";
 
 const user = Astro.locals.user;
 
-let certifications: CareerCertifications = [];
 let error: string | null = null;
 
-try {
-  certifications = await api.get<CareerCertifications>(
-    API_PATHS.UPLOAD_CERTIFICATES
-  );
-} catch (err) {
+const [certifications, err] = await asyncThrowable(() =>
+  api.get<CareerCertifications>(API_PATHS.UPLOAD_CERTIFICATES)
+);
+
+if (err) {
   error = err instanceof Error ? err.message : "Failed to load certifications";
 }
 
@@ -45,45 +45,158 @@ const formatFileSize = (bytes: number): string => {
 
   <div class="admin-card" style="margin-bottom: 1.5rem;">
     <div class="admin-card-header">
-      <h2 class="admin-card-title">Upload Certifications</h2>
+      <h2 class="admin-card-title">Upload Certification</h2>
     </div>
 
     <div id="upload-error" class="admin-alert admin-alert-error" hidden></div>
     <div id="upload-success" class="admin-alert admin-alert-success" hidden>
     </div>
 
-    <div class="upload-zone" id="upload-zone">
-      <input
-        type="file"
-        id="cert-upload"
-        multiple
-        accept="image/*,.pdf"
-        style="display: none;"
-      />
-      <label for="cert-upload" class="upload-label">
-        <div class="upload-icon">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+    <form id="certification-form" class="admin-form">
+      <div class="admin-form-row">
+        <div class="admin-form-group">
+          <label for="title" class="admin-label admin-label-required"
+            >Title</label
           >
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            class="admin-input"
+            placeholder="e.g., AWS Solutions Architect"
+            required
+          />
         </div>
-        <p class="upload-text" id="upload-text">
-          <strong>Click to upload</strong> or drag and drop
-        </p>
-        <p class="upload-hint">PNG, JPG, PDF up to 10MB</p>
-      </label>
-    </div>
+        <div class="admin-form-group">
+          <label for="issuer" class="admin-label admin-label-required"
+            >Issuer</label
+          >
+          <input
+            type="text"
+            id="issuer"
+            name="issuer"
+            class="admin-input"
+            placeholder="e.g., Amazon Web Services"
+            required
+          />
+        </div>
+      </div>
+
+      <div class="admin-form-row">
+        <div class="admin-form-group">
+          <label for="issue_date" class="admin-label admin-label-required"
+            >Issue Date</label
+          >
+          <input
+            type="date"
+            id="issue_date"
+            name="issue_date"
+            class="admin-input"
+            required
+          />
+        </div>
+        <div class="admin-form-group">
+          <label for="expiry_date" class="admin-label">Expiry Date</label>
+          <input
+            type="date"
+            id="expiry_date"
+            name="expiry_date"
+            class="admin-input"
+          />
+          <span class="admin-help-text">Leave empty if no expiration</span>
+        </div>
+      </div>
+
+      <div class="admin-form-row">
+        <div class="admin-form-group">
+          <label for="credential_id" class="admin-label">Credential ID</label>
+          <input
+            type="text"
+            id="credential_id"
+            name="credential_id"
+            class="admin-input"
+            placeholder="e.g., ABC123XYZ"
+          />
+        </div>
+        <div class="admin-form-group">
+          <label for="credential_url" class="admin-label">Credential URL</label>
+          <input
+            type="url"
+            id="credential_url"
+            name="credential_url"
+            class="admin-input"
+            placeholder="https://verify.example.com/..."
+          />
+        </div>
+      </div>
+
+      <div class="admin-form-group">
+        <label for="description" class="admin-label">Description</label>
+        <textarea
+          id="description"
+          name="description"
+          class="admin-textarea"
+          rows="2"
+          placeholder="Optional description about this certification"
+        ></textarea>
+      </div>
+
+      <div class="admin-form-group">
+        <label class="admin-label admin-label-required">Certificate File</label>
+        <div class="upload-zone" id="upload-zone">
+          <input
+            type="file"
+            id="cert-upload"
+            name="files"
+            accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
+            style="display: none;"
+            required
+          />
+          <label for="cert-upload" class="upload-label">
+            <div class="upload-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="32"
+                height="32"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
+            <p class="upload-text" id="upload-text">
+              <strong>Click to select file</strong> or drag and drop
+            </p>
+            <p class="upload-hint">PNG, JPG, JPEG, WEBP up to 10MB</p>
+          </label>
+        </div>
+        <div id="selected-file" class="selected-file" hidden>
+          <span id="selected-file-name"></span>
+          <button type="button" id="clear-file" class="clear-file-btn">
+            ×
+          </button>
+        </div>
+      </div>
+
+      <div class="admin-form-actions">
+        <button type="button" class="admin-btn admin-btn-ghost" id="reset-form">
+          Clear
+        </button>
+        <button
+          type="submit"
+          class="admin-btn admin-btn-primary"
+          id="submit-btn"
+        >
+          Upload Certification
+        </button>
+      </div>
+    </form>
   </div>
 
   <div class="admin-card">
@@ -92,7 +205,7 @@ const formatFileSize = (bytes: number): string => {
     </div>
 
     {
-      certifications.length === 0 ? (
+      !certifications?.length ? (
         <div class="admin-empty-state">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +235,7 @@ const formatFileSize = (bytes: number): string => {
               </tr>
             </thead>
             <tbody>
-              {certifications.map((cert) => (
+              {certifications?.map((cert) => (
                 <tr data-id={cert.id}>
                   <td>
                     <strong style="color: var(--admin-text)">
@@ -199,13 +312,15 @@ const formatFileSize = (bytes: number): string => {
       <button
         type="button"
         class="admin-btn admin-btn-ghost"
-        onclick="closeModal('delete-modal')">Cancel</button
-      >
+        onclick="closeModal('delete-modal');"
+        >Cancel
+      </button>
       <button
         type="button"
         class="admin-btn admin-btn-danger"
-        id="confirm-delete-btn">Delete</button
-      >
+        id="confirm-delete-btn"
+        >Delete
+      </button>
     </div>
   </Modal>
 </AdminLayout>
@@ -223,6 +338,11 @@ const formatFileSize = (bytes: number): string => {
   .upload-zone.dragover {
     border-color: var(--admin-primary);
     background: rgba(99, 102, 241, 0.05);
+  }
+
+  .upload-zone.has-file {
+    border-color: var(--admin-success);
+    background: rgba(34, 197, 94, 0.05);
   }
 
   .upload-label {
@@ -249,11 +369,59 @@ const formatFileSize = (bytes: number): string => {
     font-size: 0.8125rem;
     margin: 0;
   }
+
+  .selected-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    margin-top: 0.75rem;
+    background: var(--admin-surface);
+    border: 1px solid var(--admin-success);
+    border-radius: 0.5rem;
+    color: var(--admin-text);
+  }
+
+  .selected-file span {
+    font-size: 0.875rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .clear-file-btn {
+    background: none;
+    border: none;
+    color: var(--admin-text-muted);
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: color 0.2s;
+  }
+
+  .clear-file-btn:hover {
+    color: var(--admin-danger);
+  }
 </style>
 
 <script>
   let currentDeleteId: number | null = null;
+  let selectedFile: File | null = null;
 
+  const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
+  const ALLOWED_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp"];
+
+  function isValidImageFile(file: File): boolean {
+    const extension = "." + file.name.split(".").pop()?.toLowerCase();
+    return (
+      ALLOWED_TYPES.includes(file.type) ||
+      ALLOWED_EXTENSIONS.includes(extension)
+    );
+  }
+
+  const form = document.getElementById("certification-form") as HTMLFormElement;
   const uploadInput = document.getElementById(
     "cert-upload"
   ) as HTMLInputElement;
@@ -261,21 +429,145 @@ const formatFileSize = (bytes: number): string => {
   const uploadText = document.getElementById("upload-text");
   const uploadError = document.getElementById("upload-error");
   const uploadSuccess = document.getElementById("upload-success");
+  const selectedFileEl = document.getElementById("selected-file");
+  const selectedFileName = document.getElementById("selected-file-name");
+  const clearFileBtn = document.getElementById("clear-file");
+  const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement;
+  const resetFormBtn = document.getElementById("reset-form");
 
-  async function handleUpload(files: FileList | null) {
-    if (!files || files.length === 0) return;
+  function formatDate(dateStr: string): string {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
 
-    if (uploadText)
-      uploadText.innerHTML =
-        '<span class="admin-spinner" style="width: 16px; height: 16px;"></span> Uploading...';
+  function updateFileDisplay(file: File | null) {
+    selectedFile = file;
+    if (file) {
+      if (uploadZone) uploadZone.classList.add("has-file");
+      if (selectedFileEl) selectedFileEl.hidden = false;
+      if (selectedFileName) selectedFileName.textContent = file.name;
+      if (uploadText)
+        uploadText.innerHTML =
+          "<strong>File selected</strong> - click to change";
+    } else {
+      if (uploadZone) uploadZone.classList.remove("has-file");
+      if (selectedFileEl) selectedFileEl.hidden = true;
+      if (selectedFileName) selectedFileName.textContent = "";
+      if (uploadText)
+        uploadText.innerHTML =
+          "<strong>Click to select file</strong> or drag and drop";
+      if (uploadInput) uploadInput.value = "";
+    }
+  }
+
+  uploadInput?.addEventListener("change", (e) => {
+    const files = (e.target as HTMLInputElement).files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (!isValidImageFile(file)) {
+        if (uploadError) {
+          uploadError.textContent =
+            "Invalid file type. Only JPG, JPEG, PNG, and WEBP images are allowed.";
+          uploadError.hidden = false;
+        }
+        updateFileDisplay(null);
+        return;
+      }
+      if (uploadError) uploadError.hidden = true;
+      updateFileDisplay(file);
+    }
+  });
+
+  clearFileBtn?.addEventListener("click", () => {
+    updateFileDisplay(null);
+  });
+
+  uploadZone?.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    uploadZone.classList.add("dragover");
+  });
+
+  uploadZone?.addEventListener("dragleave", () => {
+    uploadZone.classList.remove("dragover");
+  });
+
+  uploadZone?.addEventListener("drop", (e) => {
+    e.preventDefault();
+    uploadZone.classList.remove("dragover");
+    const files = e.dataTransfer?.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (!isValidImageFile(file)) {
+        if (uploadError) {
+          uploadError.textContent =
+            "Invalid file type. Only JPG, JPEG, PNG, and WEBP images are allowed.";
+          uploadError.hidden = false;
+        }
+        return;
+      }
+      if (uploadError) uploadError.hidden = true;
+      updateFileDisplay(file);
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      if (uploadInput) uploadInput.files = dataTransfer.files;
+    }
+  });
+
+  form?.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!selectedFile) {
+      if (uploadError) {
+        uploadError.textContent = "Please select a certificate file";
+        uploadError.hidden = false;
+      }
+      return;
+    }
+
     if (uploadError) uploadError.hidden = true;
     if (uploadSuccess) uploadSuccess.hidden = true;
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML =
+        '<span class="admin-spinner" style="width: 16px; height: 16px;"></span> Uploading...';
+    }
 
     try {
       const formData = new FormData();
-      for (const file of Array.from(files)) {
-        formData.append("files", file);
-      }
+
+      formData.append("files", selectedFile);
+
+      const title = (document.getElementById("title") as HTMLInputElement)
+        ?.value;
+      const issuer = (document.getElementById("issuer") as HTMLInputElement)
+        ?.value;
+      const issueDate = (
+        document.getElementById("issue_date") as HTMLInputElement
+      )?.value;
+      const expiryDate = (
+        document.getElementById("expiry_date") as HTMLInputElement
+      )?.value;
+      const credentialId = (
+        document.getElementById("credential_id") as HTMLInputElement
+      )?.value;
+      const credentialUrl = (
+        document.getElementById("credential_url") as HTMLInputElement
+      )?.value;
+      const description = (
+        document.getElementById("description") as HTMLTextAreaElement
+      )?.value;
+
+      if (title) formData.append("title", title);
+      if (issuer) formData.append("issuer", issuer);
+      if (issueDate) formData.append("issue_date", formatDate(issueDate));
+      if (expiryDate) formData.append("expiry_date", formatDate(expiryDate));
+      if (credentialId) formData.append("credential_id", credentialId);
+      if (credentialUrl) formData.append("credential_url", credentialUrl);
+      if (description) formData.append("description", description);
 
       const response = await fetch("/api/admin/certifications", {
         method: "POST",
@@ -291,7 +583,7 @@ const formatFileSize = (bytes: number): string => {
 
       const result = data.data;
       if (uploadSuccess) {
-        uploadSuccess.textContent = `Successfully uploaded ${result.successful} file(s)${result.failed > 0 ? `, ${result.failed} failed` : ""}`;
+        uploadSuccess.textContent = `Successfully uploaded "${title}"`;
         uploadSuccess.hidden = false;
       }
 
@@ -302,30 +594,18 @@ const formatFileSize = (bytes: number): string => {
           err instanceof Error ? err.message : "Upload failed";
         uploadError.hidden = false;
       }
-      if (uploadText)
-        uploadText.innerHTML =
-          "<strong>Click to upload</strong> or drag and drop";
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Upload Certification";
+      }
     }
-  }
-
-  uploadInput?.addEventListener("change", (e) => {
-    handleUpload((e.target as HTMLInputElement).files);
   });
 
-  // Drag and drop
-  uploadZone?.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    uploadZone.classList.add("dragover");
-  });
-
-  uploadZone?.addEventListener("dragleave", () => {
-    uploadZone.classList.remove("dragover");
-  });
-
-  uploadZone?.addEventListener("drop", (e) => {
-    e.preventDefault();
-    uploadZone.classList.remove("dragover");
-    handleUpload(e.dataTransfer?.files || null);
+  resetFormBtn?.addEventListener("click", () => {
+    form?.reset();
+    updateFileDisplay(null);
+    if (uploadError) uploadError.hidden = true;
+    if (uploadSuccess) uploadSuccess.hidden = true;
   });
 
   function openDeleteModal(id: number, name: string) {

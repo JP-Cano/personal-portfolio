@@ -3,7 +3,13 @@ export const prerender = false;
 
 const { pathname } = Astro.url;
 
-if (!pathname.startsWith("/admin")) {
+const isStaticAsset =
+  /\.(ico|svg|png|jpg|jpeg|gif|webp|css|js|woff|woff2|ttf|eot)$/i.test(
+    pathname
+  );
+const isApiRoute = pathname.startsWith("/api/");
+
+if (!pathname.startsWith("/admin") && !isStaticAsset && !isApiRoute) {
   return Astro.redirect("/");
 }
 ---
@@ -13,9 +19,13 @@ if (!pathname.startsWith("/admin")) {
   <head>
     <meta charset="UTF-8" />
     <title>Page Not Found</title>
-    <meta http-equiv="refresh" content="0;url=/" />
   </head>
-  <body>
-    <p>Redirecting to home page...</p>
+  <body
+    style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #0f172a; color: #f1f5f9; text-align: center;"
+  >
+    <div>
+      <h1>404 - Not Found</h1>
+      <p>The requested resource was not found.</p>
+    </div>
   </body>
 </html>

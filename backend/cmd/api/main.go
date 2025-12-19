@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"strings"
+	"time"
 
 	_ "github.com/JuanPabloCano/personal-portfolio/backend/docs"
 	"github.com/JuanPabloCano/personal-portfolio/backend/internal/handlers"
@@ -70,7 +71,9 @@ func main() {
 
 	db := database.GetDB()
 
-	projectHandler, experienceHandler, careerCertificationHandler := registerDependencies(db)
+	projectHandler, experienceHandler, careerCertificationHandler, authHandler, authService := registerDependencies(db)
+
+	cleanExpiredSessions(authService)
 
 	// Set Gin to release mode if not in debug
 	if os.Getenv("DEBUG") != "true" {
@@ -90,6 +93,8 @@ func main() {
 	origins := os.Getenv("ALLOWED_ORIGINS")
 	config := cors.DefaultConfig()
 	config.AllowOrigins = strings.Split(origins, ",")
+	config.AllowCredentials = true
+	config.AllowHeaders = append(config.AllowHeaders, "Authorization", "Cookie")
 
 	for _, origin := range config.AllowOrigins {
 		logger.Debug("Allowed origin: %s", origin)
@@ -107,6 +112,8 @@ func main() {
 		experienceHandler,
 		projectHandler,
 		careerCertificationHandler,
+		authHandler,
+		authService,
 	)
 
 	port := os.Getenv("SERVER_PORT")
@@ -123,6 +130,23 @@ func main() {
 	}
 }
 
+// cleanExpiredSessions periodically removes expired sessions using the provided AuthService at a 30-day interval.
+func cleanExpiredSessions(authService services.AuthService) {
+	go func() {
+		ticker := time.NewTicker(30 * 24 * time.Hour)
+		defer ticker.Stop()
+
+		for range ticker.C {
+			if err := authService.CleanUpExpiredSessions(); err != nil {
+				logger.Error("Failed to cleanup expired sessions: %s", err.Error())
+			} else {
+				logger.Info("Cleaned up expired sessions")
+			}
+		}
+	}()
+}
+
+// configDatabaseDriver initializes and returns a database.Config based on environment variables or defaults.
 func configDatabaseDriver() database.Config {
 	dbDriver := os.Getenv("DB_DRIVER")
 	if dbDriver == "" {
@@ -163,21 +187,34 @@ func configDatabaseDriver() database.Config {
 	return dbConfig
 }
 
-// registerDependencies initializes and registers all necessary dependencies for project and experience handlers.
-// It returns the initialized ProjectHandler and ExperienceHandler instances.
-func registerDependencies(db *gorm.DB) (*handlers.ProjectHandler, *handlers.ExperienceHandler, *handlers.CareerCertificationHandler) {
+// registerDependencies initializes and registers all necessary dependencies for handlers.
+// It returns the initialized handlers and auth service.
+func registerDependencies(db *gorm.DB) (
+	*handlers.ProjectHandler,
+	*handlers.ExperienceHandler,
+	*handlers.CareerCertificationHandler,
+	*handlers.AuthHandler,
+	services.AuthService,
+) {
+	// Experience dependencies
 	experienceRepo := repository.NewExperienceRepository(db)
 	experienceService := services.NewExperienceService(experienceRepo)
 	experienceHandler := handlers.NewExperienceHandler(experienceService)
 
+	// Project dependencies
 	projectRepo := repository.NewProjectRepository(db)
 	projectService := services.NewProjectService(projectRepo)
 	projectHandler := handlers.NewProjectHandler(projectService)
 
+	// Career certification dependencies
 	careerCertificationRepo := repository.NewCareerCertificationRepository(db)
 	careerCertificationService := services.NewCareerCertificationService(careerCertificationRepo)
 	careerCertificationHandler := handlers.NewCareerCertificationHandler(careerCertificationService)
 
-	return projectHandler, experienceHandler, careerCertificationHandler
+	// Auth dependencies
+	authRepo := repository.NewAuthRepository(db)
+	authService := services.NewAuthService(authRepo)
+	authHandler := handlers.NewAuthHandler(authService)
 
+	return projectHandler, experienceHandler, careerCertificationHandler, authHandler, authService
 }

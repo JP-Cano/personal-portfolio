@@ -16,14 +16,20 @@ const user = Astro.locals.user;
 const [experiences, experiencesError] = await asyncThrowable<Experiences>(() =>
   api.get<Experiences>(API_PATHS.EXPERIENCES)
 );
-console.error({ experiencesError });
+
+if (experiencesError) {
+  console.error({ experiencesError });
+}
 
 const experienceCount = experiences?.length ?? 0;
 
 const [projects, projectsError] = await asyncThrowable<Projects>(() =>
   api.get<Projects>(API_PATHS.PROJECTS)
 );
-console.error({ projectsError });
+
+if (projectsError) {
+  console.error({ projectsError });
+}
 
 const projectCount = projects?.length ?? 0;
 
@@ -31,7 +37,10 @@ const [certifications, certificationsError] =
   await asyncThrowable<CareerCertifications>(() =>
     api.get<CareerCertifications>(API_PATHS.UPLOAD_CERTIFICATES)
   );
-console.error({ certificationsError });
+
+if (certificationsError) {
+  console.error({ certificationsError });
+}
 
 const certificationCount = certifications?.length ?? 0;
 ---
@@ -157,16 +166,16 @@ const certificationCount = certifications?.length ?? 0;
   }
 
   .quick-actions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
   }
 
   .quick-action-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 1rem;
-    padding: 1.25rem;
+    padding: 1rem;
     background: var(--admin-bg);
     border: 1px solid var(--admin-border);
     border-radius: 0.5rem;
@@ -180,11 +189,11 @@ const certificationCount = certifications?.length ?? 0;
   }
 
   .quick-action-icon {
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
     background: linear-gradient(135deg, var(--admin-primary), #a78bfa);
-    border-radius: 0.5rem;
+    border-radius: 0.625rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -194,6 +203,10 @@ const certificationCount = certifications?.length ?? 0;
   .quick-action-icon svg {
     width: 20px;
     height: 20px;
+  }
+
+  .quick-action-content {
+    min-width: 0;
   }
 
   .quick-action-content h3 {
@@ -207,5 +220,15 @@ const certificationCount = certifications?.length ?? 0;
     font-size: 0.8125rem;
     color: var(--admin-text-muted);
     margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (min-width: 640px) {
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+    }
   }
 </style>

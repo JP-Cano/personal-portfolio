@@ -59,6 +59,16 @@ definitions:
       url:
         type: string
     type: object
+  dto.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
   dto.ProjectRequest:
     properties:
       description:
@@ -147,6 +157,13 @@ definitions:
         maxLength: 500
         type: string
     type: object
+  models.AuthResponse:
+    properties:
+      message:
+        type: string
+      user:
+        $ref: '#/definitions/models.UserResponse'
+    type: object
   models.CareerCertification:
     properties:
       created_at:
@@ -180,6 +197,13 @@ definitions:
       updated_at:
         type: string
     type: object
+  models.UserResponse:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+    type: object
   utils.ErrorResponse:
     properties:
       error:
@@ -200,6 +224,84 @@ info:
   title: Personal Portfolio API
   version: "1.0"
 paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user with email and password, sets session cookie
+      parameters:
+      - description: Login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AuthResponse'
+              type: object
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Login user
+      tags:
+      - auth
+  /auth/logout:
+    post:
+      description: Logs out the current user by deleting their session
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Logout successful
+          schema:
+            $ref: '#/definitions/utils.SuccessResponse'
+        "401":
+          description: Not authenticated
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Logout user
+      tags:
+      - auth
+  /auth/me:
+    get:
+      description: Returns the currently authenticated user based on session cookie
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Current user data
+          schema:
+            allOf:
+            - $ref: '#/definitions/utils.SuccessResponse'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.UserResponse'
+              type: object
+        "401":
+          description: Not authenticated
+          schema:
+            $ref: '#/definitions/utils.ErrorResponse'
+      summary: Get current user
+      tags:
+      - auth
   /experiences:
     get:
       consumes:

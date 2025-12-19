@@ -39,12 +39,26 @@ func LoggerMiddleware() gin.HandlerFunc {
 			"user_agent": c.Request.UserAgent(),
 		})
 
+		// Get error message if any
+		errorMsg := ""
+		if len(c.Errors) > 0 {
+			errorMsg = c.Errors.Last().Error()
+		}
+
 		// Log based on status code
 		switch {
 		case statusCode >= 500:
-			log.Error("Server error")
+			if errorMsg != "" {
+				log.Error(errorMsg)
+			} else {
+				log.Error("Server error")
+			}
 		case statusCode >= 400:
-			log.Warn("Client error")
+			if errorMsg != "" {
+				log.Error(errorMsg)
+			} else {
+				log.Error("Client error")
+			}
 		case statusCode >= 300:
 			log.Info("Redirection")
 		case statusCode >= 200:

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -24,8 +25,10 @@ func RespondWithError(c *gin.Context, statusCode int, message string, err error)
 
 	if message != "" {
 		response.Message = message
+		_ = c.Error(fmt.Errorf("%s", message))
 	} else if err != nil {
 		response.Message = err.Error()
+		_ = c.Error(err)
 	}
 
 	c.JSON(statusCode, response)

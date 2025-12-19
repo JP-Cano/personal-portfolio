@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -147,7 +148,19 @@ func (c *careerCertificationService) uploadWorker(ctx context.Context, workerID 
 		default:
 		}
 
-		ext := filepath.Ext(file.Filename)
+		ext := strings.ToLower(filepath.Ext(file.Filename))
+
+		// Validate file extension
+		if !utils.AllowedExtensions[ext] {
+			logger.Warn("Worker %d: invalid file type %s for %s", workerID, ext, file.Filename)
+			results <- UploadResult{
+				OriginalName: file.Filename,
+				Error:        fmt.Errorf("invalid file type: only JPG, JPEG, PNG, and WEBP images are allowed"),
+				Success:      false,
+			}
+			continue
+		}
+
 		filename := fmt.Sprintf("%d-%s%s", time.Now().UnixNano(), uuid.New().String(), ext)
 		filePath := filepath.Join(c.uploadDir, filename)
 

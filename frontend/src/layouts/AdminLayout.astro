@@ -208,8 +208,33 @@ const getInitial = (email?: string) => {
         }
       </aside>
 
+      <!-- Mobile overlay -->
+      <div class="admin-sidebar-overlay" id="sidebar-overlay"></div>
+
       <main class="admin-main">
         <header class="admin-header">
+          <button
+            type="button"
+            class="admin-menu-toggle"
+            id="menu-toggle"
+            aria-label="Toggle menu"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          </button>
           <h1 class="admin-header-title">{title}</h1>
         </header>
 
@@ -218,5 +243,50 @@ const getInitial = (email?: string) => {
         </div>
       </main>
     </div>
+
+    <script>
+      const menuToggle = document.getElementById("menu-toggle");
+      const sidebar = document.querySelector(".admin-sidebar");
+      const overlay = document.getElementById("sidebar-overlay");
+
+      function openSidebar() {
+        sidebar?.classList.add("open");
+        overlay?.classList.add("visible");
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeSidebar() {
+        sidebar?.classList.remove("open");
+        overlay?.classList.remove("visible");
+        document.body.style.overflow = "";
+      }
+
+      menuToggle?.addEventListener("click", () => {
+        if (sidebar?.classList.contains("open")) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
+      });
+
+      overlay?.addEventListener("click", closeSidebar);
+
+      // Close on escape key
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && sidebar?.classList.contains("open")) {
+          closeSidebar();
+        }
+      });
+
+      // Close sidebar when clicking a nav link (for mobile UX)
+      const navLinks = document.querySelectorAll(".admin-nav-link");
+      navLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+          if (window.innerWidth <= 768) {
+            closeSidebar();
+          }
+        });
+      });
+    </script>
   </body>
 </html>

@@ -12,6 +12,7 @@ backend/*.db
 backend/*.db-journal
 backend/tmp/
 backend/.air.toml
+backend/pkg/assets/career-certifications/*
 
 # Frontend
 frontend/node_modules/

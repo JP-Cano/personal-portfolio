@@ -52,9 +52,31 @@ export class ApiClient {
   /**
    * Login with email and password.
    * The backend will set an HttpOnly cookie with the session ID.
+   * Returns both the auth response and the Set-Cookie header for SSR forwarding.
    */
-  async login(credentials: LoginRequest): Promise<AuthResponse> {
-    return this.post<AuthResponse>("auth/login", credentials);
+  async login(
+    credentials: LoginRequest
+  ): Promise<{ data: AuthResponse; setCookie: string | null }> {
+    const url = `${PORTFOLIO_BACKEND_URL}/auth/login`;
+
+    const response = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify(credentials),
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new ApiError(error.message || error.error, response.status);
+    }
+
+    const result = await response.json();
+    const setCookie = response.headers.get("set-cookie");
+
+    return { data: result.data, setCookie };
   }
 
   /**

@@ -25,7 +25,7 @@ const hasError = error !== null;
       !hasError &&
         projects &&
         projects.length > 0 &&
-        projects.map(({ url, description, name, startDate, endDate, id }) => {
+        projects.map(({ url, description, name, endDate, id }) => {
           const isActive = !endDate;
           return (
             <li class="project-item">
@@ -43,10 +43,27 @@ const hasError = error !== null;
                         {name}
                       </a>
                     </h3>
-                    {isActive && (
+                    {isActive ? (
                       <span class="status-badge active">
                         <span class="status-dot" />
                         Active
+                      </span>
+                    ) : (
+                      <span class="status-badge completed">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="3"
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                        >
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                        Completed
                       </span>
                     )}
                   </div>
@@ -60,16 +77,6 @@ const hasError = error !== null;
                       })}
                     </div>
                   )}
-                  {url && (
-                    <a
-                      class="github-link"
-                      href={url}
-                      target="_blank"
-                      rel="noopener"
-                      title={`View ${name} on GitHub`}
-                      aria-label="View on GitHub"
-                    />
-                  )}
                 </footer>
               </article>
             </li>
@@ -80,28 +87,22 @@ const hasError = error !== null;
 </Section>
 
 <style>
-  .empty-state {
-    text-align: center;
-    padding: 3rem 1rem;
-    color: var(--color-text-light);
-    font-size: 1.1rem;
-  }
-
   .projects-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 2rem;
     padding: 0;
     list-style: none;
+    align-items: stretch;
   }
 
   .project-item {
-    height: 100%;
+    display: flex;
   }
 
   .project-card {
     position: relative;
-    height: 100%;
+    width: 100%;
     display: flex;
     flex-direction: column;
     background: var(--color-surface);
@@ -146,22 +147,26 @@ const hasError = error !== null;
 
   .project-title-row {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    align-items: flex-start;
     gap: 1rem;
     margin-bottom: 1rem;
-    flex-wrap: wrap;
   }
 
   .project-title {
     font-size: 1.5rem;
     margin: 0;
+    flex: 1;
+    min-width: 0;
   }
 
   .project-title a {
     color: var(--color-text);
     position: relative;
     transition: color 0.3s ease;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .project-title a::after {
@@ -193,15 +198,28 @@ const hasError = error !== null;
     gap: 0.4rem;
     padding: 0.4rem 0.8rem;
     border-radius: 20px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    flex-shrink: 0;
+    white-space: nowrap;
   }
 
   .status-badge.active {
-    background: rgba(34, 197, 94, 0.1);
-    color: #16a34a;
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+
+  .status-badge.completed {
+    background: rgba(99, 102, 241, 0.1);
+    color: #818cf8;
+    border: 1px solid rgba(99, 102, 241, 0.2);
+  }
+
+  .status-badge.completed svg {
+    flex-shrink: 0;
   }
 
   .status-dot {
@@ -216,9 +234,11 @@ const hasError = error !== null;
     0%,
     100% {
       opacity: 1;
+      transform: scale(1);
     }
     50% {
-      opacity: 0.3;
+      opacity: 0.5;
+      transform: scale(0.8);
     }
   }
 
@@ -233,7 +253,8 @@ const hasError = error !== null;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-top: 1.5rem;
+    margin-top: auto;
+    padding-top: 1.5rem;
     z-index: 1;
   }
 
@@ -256,25 +277,6 @@ const hasError = error !== null;
   .project-card:hover .highlight-tag {
     background: rgba(99, 102, 241, 0.1);
     color: var(--color-primary);
-  }
-
-  .github-link {
-    margin-top: 16px;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
-    color: white;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    align-self: flex-start;
-  }
-
-  .github-link:hover {
-    background: var(--color-primary);
-    transform: translateX(4px);
   }
 
   @media (width <= 768px) {
