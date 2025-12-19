@@ -1,5 +1,8 @@
 -- +goose Up
 -- +goose StatementBegin
+-- Drop the old sessions table and recreate with correct foreign key
+DROP TABLE IF EXISTS sessions;
+
 CREATE TABLE IF NOT EXISTS sessions
 (
     id         TEXT PRIMARY KEY,
@@ -9,11 +12,10 @@ CREATE TABLE IF NOT EXISTS sessions
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
 
--- Create index on deleted_at for better query performance with soft deletes
-CREATE INDEX idx_sessions_expires_at ON sessions (expires_at);
+CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions (expires_at);
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS sessions;
+-- This is a fix migration, no down needed
 -- +goose StatementEnd
