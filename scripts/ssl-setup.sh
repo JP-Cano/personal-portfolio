@@ -136,6 +136,16 @@ server {
 
     add_header Strict-Transport-Security "max-age=31536000" always;
 
+    # Admin API routes - proxy to FRONTEND (Astro API routes)
+    location /api/admin/ {
+        proxy_pass http://frontend:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Cookie $http_cookie;
+    }
+
     location /api/ {
         proxy_pass http://backend:8080;
         proxy_set_header Host $host;

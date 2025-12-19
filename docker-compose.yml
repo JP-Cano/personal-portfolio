@@ -14,6 +14,11 @@ services:
       - TURSO_AUTH_TOKEN=${TURSO_AUTH_TOKEN}
       - DEBUG=${DEBUG:-false}
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-http://localhost}
+      - SESSION_COOKIE_NAME=${SESSION_COOKIE_NAME:-portfolio_session}
+      - COOKIE_SECURE=${COOKIE_SECURE}
+      - COOKIE_DOMAIN=${COOKIE_DOMAIN}
+      - COOKIE_SAME_SITE=${COOKIE_SAME_SITE}
     volumes:
       - ./data/backend:/app/data
       - ./data/certifications:/app/assets/certifications

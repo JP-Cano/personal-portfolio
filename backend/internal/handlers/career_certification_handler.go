@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
@@ -78,11 +79,16 @@ func (h *CareerCertificationHandler) UploadAcademicCertificates(c *gin.Context) 
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
-	scheme := "http"
-	if c.Request.TLS != nil {
-		scheme = "https"
+	baseURL := os.Getenv("PUBLIC_BASE_URL")
+	if baseURL == "" {
+		scheme := "http"
+		if c.Request.TLS != nil {
+			scheme = "https"
+		}
+		baseURL = fmt.Sprintf("%s://%s", scheme, c.Request.Host)
+		logger.Warn("PUBLIC_BASE_URL not set, falling back to: %s", baseURL)
 	}
-	baseURL := fmt.Sprintf("%s://%s/certifications", scheme, c.Request.Host)
+	baseURL = fmt.Sprintf("%s/certifications", baseURL)
 
 	results := h.service.StoreBatch(ctx, filesWithMetadata, params.Workers, baseURL)
 

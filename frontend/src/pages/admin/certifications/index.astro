@@ -580,8 +580,6 @@ const formatFileSize = (bytes: number): string => {
       if (!response.ok) {
         throw new Error(data.error || "Upload failed");
       }
-
-      const result = data.data;
       if (uploadSuccess) {
         uploadSuccess.textContent = `Successfully uploaded "${title}"`;
         uploadSuccess.hidden = false;
