@@ -189,5 +189,4 @@ func (p *ProjectHandler) DeleteProject(c *gin.Context) {
 	}
 
 	utils.RespondWithSuccess(c, http.StatusOK, nil, "Project deleted successfully")
-	return
 }

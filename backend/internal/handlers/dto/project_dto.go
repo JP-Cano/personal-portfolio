@@ -8,42 +8,51 @@ import (
 )
 
 type ProjectResponse struct {
-	ID          uint       `json:"id"`
-	Name        string     `json:"name"`
-	Description string     `json:"description"`
-	URL         string     `json:"url,omitempty"`
-	StartDate   time.Time  `json:"startDate"`
-	EndDate     *time.Time `json:"endDate,omitempty"`
-	CreatedAt   time.Time  `json:"createdAt"`
-	UpdatedAt   time.Time  `json:"updatedAt"`
+	ID           uint       `json:"id"`
+	Name         string     `json:"name"`
+	Description  string     `json:"description"`
+	URL          string     `json:"url,omitempty"`
+	StartDate    time.Time  `json:"startDate"`
+	EndDate      *time.Time `json:"endDate,omitempty"`
+	CreatedAt    time.Time  `json:"createdAt"`
+	UpdatedAt    time.Time  `json:"updatedAt"`
+	Technologies string     `json:"technologies"`
 }
 
 type ProjectRequest struct {
-	Name        string `json:"name" binding:"required" validate:"required,min=1,max=255"`
-	Description string `json:"description" binding:"required" validate:"required,min=1,max=500"`
-	URL         string `json:"url,omitempty" validate:"omitempty,url,max=500"`
-	StartDate   string `json:"start_date" binding:"required" validate:"required,date_format"`
-	EndDate     string `json:"end_date,omitempty" validate:"omitempty,date_format,after_start_date_str"`
+	Name         string `json:"name" binding:"required" validate:"required,min=1,max=255"`
+	Description  string `json:"description" binding:"required" validate:"required,min=1,max=500"`
+	URL          string `json:"url,omitempty" validate:"omitempty,url,max=500"`
+	StartDate    string `json:"start_date" binding:"required" validate:"required,date_format"`
+	EndDate      string `json:"end_date,omitempty" validate:"omitempty,date_format,after_start_date_str"`
+	Technologies string `json:"technologies" validate:"omitempty,max=500"`
 }
 
 type UpdateProjectRequest struct {
-	Name        *string `json:"name,omitempty" validate:"omitempty,min=1,max=255"`
-	Description *string `json:"description,omitempty" validate:"omitempty,min=1,max=500"`
-	URL         *string `json:"url,omitempty" validate:"omitempty,url,max=500"`
-	StartDate   *string `json:"start_date,omitempty" validate:"omitempty,date_format"`
-	EndDate     *string `json:"end_date,omitempty" validate:"omitempty,date_format"`
+	Name         *string `json:"name,omitempty" validate:"omitempty,min=1,max=255"`
+	Description  *string `json:"description,omitempty" validate:"omitempty,min=1,max=500"`
+	URL          *string `json:"url,omitempty" validate:"omitempty,url,max=500"`
+	StartDate    *string `json:"start_date,omitempty" validate:"omitempty,date_format"`
+	EndDate      *string `json:"end_date,omitempty" validate:"omitempty,date_format"`
+	Technologies *string `json:"technologies,omitempty" validate:"omitempty,max=500"`
 }
 
 func ToProjectResponse(project *models.Project) ProjectResponse {
+	var endDate *time.Time
+	if project.EndDate != nil {
+		endDate = &project.EndDate.Time
+	}
+
 	return ProjectResponse{
-		ID:          project.ID,
-		Name:        project.Name,
-		Description: project.Description,
-		URL:         project.URL,
-		StartDate:   project.StartDate,
-		EndDate:     project.EndDate,
-		CreatedAt:   project.CreatedAt,
-		UpdatedAt:   project.UpdatedAt,
+		ID:           project.ID,
+		Name:         project.Name,
+		Description:  project.Description,
+		URL:          project.URL,
+		StartDate:    project.StartDate.Time,
+		EndDate:      endDate,
+		CreatedAt:    project.CreatedAt,
+		UpdatedAt:    project.UpdatedAt,
+		Technologies: project.Technologies,
 	}
 }
 
@@ -56,28 +65,23 @@ func ToProjectResponseList(projects []models.Project) []ProjectResponse {
 }
 
 func (req *ProjectRequest) ToProject() (*models.Project, error) {
-	// Parse start date
-	startDate, err := utils.ParseDate(req.StartDate)
+	startDate, err := utils.ParseToDate(req.StartDate)
 	if err != nil {
 		return nil, err
 	}
 
-	// Parse end date if provided
-	var endDate *time.Time
-	if req.EndDate != "" {
-		parsed, err := utils.ParseDateToPtr(req.EndDate)
-		if err != nil {
-			return nil, err
-		}
-		endDate = parsed
+	endDate, err := utils.ParseToDatePtr(req.EndDate)
+	if err != nil {
+		return nil, err
 	}
 
 	return &models.Project{
-		Name:        req.Name,
-		Description: req.Description,
-		URL:         req.URL,
-		StartDate:   startDate,
-		EndDate:     endDate,
+		Name:         req.Name,
+		Description:  req.Description,
+		URL:          req.URL,
+		StartDate:    startDate,
+		EndDate:      endDate,
+		Technologies: req.Technologies,
 	}, nil
 }
 
@@ -98,7 +102,7 @@ func (req *UpdateProjectRequest) ToUpdateMap() (map[string]interface{}, error) {
 	}
 
 	if req.StartDate != nil {
-		startDate, err := utils.ParseDate(*req.StartDate)
+		startDate, err := utils.ParseToDate(*req.StartDate)
 		if err != nil {
 			return nil, err
 		}
@@ -110,12 +114,16 @@ func (req *UpdateProjectRequest) ToUpdateMap() (map[string]interface{}, error) {
 			// Allow clearing the end date
 			updates["end_date"] = nil
 		} else {
-			endDate, err := utils.ParseDateToPtr(*req.EndDate)
+			endDate, err := utils.ParseToDatePtr(*req.EndDate)
 			if err != nil {
 				return nil, err
 			}
 			updates["end_date"] = endDate
 		}
+	}
+
+	if req.Technologies != nil {
+		updates["technologies"] = *req.Technologies
 	}
 
 	return updates, nil

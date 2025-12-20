@@ -48,6 +48,11 @@ type UpdateExperienceRequest struct {
 
 // ToExperienceResponse converts a models.Experience to ExperienceResponse
 func ToExperienceResponse(experience *models.Experience) ExperienceResponse {
+	var endDate *time.Time
+	if experience.EndDate != nil {
+		endDate = &experience.EndDate.Time
+	}
+
 	return ExperienceResponse{
 		ID:          experience.ID,
 		Title:       experience.Title,
@@ -55,8 +60,8 @@ func ToExperienceResponse(experience *models.Experience) ExperienceResponse {
 		Company:     experience.Company,
 		Location:    experience.Location,
 		Type:        string(experience.Type),
-		StartDate:   experience.StartDate,
-		EndDate:     experience.EndDate,
+		StartDate:   experience.StartDate.Time,
+		EndDate:     endDate,
 		Description: experience.Description,
 		CreatedAt:   experience.CreatedAt,
 		UpdatedAt:   experience.UpdatedAt,
@@ -74,18 +79,14 @@ func ToExperienceResponseList(experiences []models.Experience) []ExperienceRespo
 
 // ToExperience converts ExperienceRequest to models.Experience
 func (req *ExperienceRequest) ToExperience() (*models.Experience, error) {
-	startDate, err := utils.ParseDate(req.StartDate)
+	startDate, err := utils.ParseToDate(req.StartDate)
 	if err != nil {
 		return nil, err
 	}
 
-	var endDate *time.Time
-	if req.EndDate != "" {
-		parsed, err := utils.ParseDateToPtr(req.EndDate)
-		if err != nil {
-			return nil, err
-		}
-		endDate = parsed
+	endDate, err := utils.ParseToDatePtr(req.EndDate)
+	if err != nil {
+		return nil, err
 	}
 
 	return &models.Experience{
@@ -125,7 +126,7 @@ func (req *UpdateExperienceRequest) ToUpdateMap() (map[string]interface{}, error
 	}
 
 	if req.StartDate != nil {
-		startDate, err := utils.ParseDate(*req.StartDate)
+		startDate, err := utils.ParseToDate(*req.StartDate)
 		if err != nil {
 			return nil, err
 		}
@@ -137,7 +138,7 @@ func (req *UpdateExperienceRequest) ToUpdateMap() (map[string]interface{}, error
 			// Allow clearing the end date
 			updates["end_date"] = nil
 		} else {
-			endDate, err := utils.ParseDateToPtr(*req.EndDate)
+			endDate, err := utils.ParseToDatePtr(*req.EndDate)
 			if err != nil {
 				return nil, err
 			}

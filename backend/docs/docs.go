@@ -1073,6 +1073,10 @@ const docTemplate = `{
                 "start_date": {
                     "type": "string"
                 },
+                "technologies": {
+                    "type": "string",
+                    "maxLength": 500
+                },
                 "url": {
                     "type": "string",
                     "maxLength": 500
@@ -1098,6 +1102,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "startDate": {
+                    "type": "string"
+                },
+                "technologies": {
                     "type": "string"
                 },
                 "updatedAt": {
@@ -1166,6 +1173,10 @@ const docTemplate = `{
                 },
                 "start_date": {
                     "type": "string"
+                },
+                "technologies": {
+                    "type": "string",
+                    "maxLength": 500
                 },
                 "url": {
                     "type": "string",

@@ -49,3 +49,26 @@ func ParseDateToPtr(dateStr string) (*time.Time, error) {
 
 	return &t, nil
 }
+
+// ParseToDate parses a date string and returns a custom Date type
+func ParseToDate(dateStr string) (Date, error) {
+	t, err := ParseDate(dateStr)
+	if err != nil {
+		return Date{}, err
+	}
+	return Date{Time: t}, nil
+}
+
+// ParseToDatePtr parses a date string and returns a pointer to Date (for nullable columns)
+func ParseToDatePtr(dateStr string) (*Date, error) {
+	if strings.TrimSpace(dateStr) == "" {
+		return nil, nil
+	}
+
+	t, err := ParseDate(dateStr)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Date{Time: t}, nil
+}
