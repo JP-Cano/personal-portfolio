@@ -22,6 +22,7 @@ const { title, id } = Astro.props;
   .content-section {
     padding: 6rem 2rem;
     position: relative;
+    overflow-x: hidden;
   }
 
   .content-section:nth-child(even) {
@@ -31,6 +32,7 @@ const { title, id } = Astro.props;
   .section-container {
     max-width: 1400px;
     margin: 0 auto;
+    width: 100%;
   }
 
   .section-header {
@@ -80,6 +82,16 @@ const { title, id } = Astro.props;
 
     .section-header {
       margin-bottom: 3rem;
+    }
+  }
+
+  @media (width <= 400px) {
+    .content-section {
+      padding: 3rem 1rem;
+    }
+
+    .section-header {
+      margin-bottom: 2rem;
     }
   }
 </style>

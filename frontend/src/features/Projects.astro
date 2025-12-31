@@ -12,9 +12,12 @@ const [projects, error] = await asyncThrowable<Projects>(() =>
   api.get<Projects>(API_PATHS.PROJECTS)
 );
 
-const technologies = ["node", "java", "postgres"];
-
 const hasError = error !== null;
+
+const parseTechnologies = (techString: string | undefined): string[] => {
+  if (!techString) return [];
+  return techString.split(",").map((tech) => tech.trim()).filter((tech) => tech !== "");
+};
 ---
 
 <Section title="Projects" id="projects">
@@ -25,8 +28,9 @@ const hasError = error !== null;
       !hasError &&
         projects &&
         projects.length > 0 &&
-        projects.map(({ url, description, name, endDate, id }) => {
+        projects.map(({ url, description, name, endDate, technologies }) => {
           const isActive = !endDate;
+          const techArray = parseTechnologies(technologies);
           return (
             <li class="project-item">
               <article class="project-card">
@@ -70,9 +74,9 @@ const hasError = error !== null;
                   <p class="project-description">{description}</p>
                 </header>
                 <footer class="project-footer">
-                  {technologies && technologies.length > 0 && (
+                  {techArray.length > 0 && (
                     <div class="highlights">
-                      {technologies.map((tech) => {
+                      {techArray.map((tech) => {
                         return <span class="highlight-tag">{tech}</span>;
                       })}
                     </div>
@@ -89,20 +93,25 @@ const hasError = error !== null;
 <style>
   .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
     gap: 2rem;
     padding: 0;
     list-style: none;
     align-items: stretch;
+    width: 100%;
+    max-width: 100%;
   }
 
   .project-item {
     display: flex;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .project-card {
     position: relative;
     width: 100%;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     background: var(--color-surface);
@@ -112,6 +121,7 @@ const hasError = error !== null;
     border: 1px solid var(--color-border);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    box-sizing: border-box;
   }
 
   .card-background {
@@ -143,13 +153,15 @@ const hasError = error !== null;
   .project-header {
     flex: 1;
     z-index: 1;
+    min-width: 0;
   }
 
   .project-title-row {
     display: flex;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.75rem;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
   }
 
   .project-title {
@@ -167,6 +179,7 @@ const hasError = error !== null;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    word-break: break-word;
   }
 
   .project-title a::after {
@@ -247,6 +260,13 @@ const hasError = error !== null;
     line-height: 1.6;
     color: var(--color-text);
     margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   .project-footer {
@@ -272,6 +292,8 @@ const hasError = error !== null;
     font-size: 0.85rem;
     font-weight: 500;
     transition: all 0.2s ease;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   .project-card:hover .highlight-tag {
@@ -293,8 +315,42 @@ const hasError = error !== null;
       font-size: 1.25rem;
     }
 
+    .project-title-row {
+      gap: 0.5rem;
+    }
+
     .project-description {
       font-size: 0.95rem;
+    }
+
+    .status-badge {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.65rem;
+    }
+  }
+
+  @media (width <= 400px) {
+    .project-card {
+      padding: 1.25rem;
+    }
+
+    .project-title {
+      font-size: 1.1rem;
+    }
+
+    .project-title-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .status-badge {
+      align-self: flex-start;
+    }
+
+    .highlight-tag {
+      padding: 0.3rem 0.6rem;
+      font-size: 0.8rem;
     }
   }
 

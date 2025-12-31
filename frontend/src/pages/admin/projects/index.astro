@@ -131,6 +131,7 @@ const formatDateForInput = (date: Date | string | undefined): string => {
                           url: project.url || "",
                           start_date: formatDateForInput(project.startDate),
                           end_date: formatDateForInput(project.endDate),
+                          technologies: project.technologies || "",
                         })})`}
                         title="Edit"
                       >
@@ -255,6 +256,38 @@ const formatDateForInput = (date: Date | string | undefined): string => {
         </div>
       </div>
 
+      <div class="admin-form-group">
+        <label class="admin-label">Technologies</label>
+        <div id="technologies-container">
+          <!-- Technology inputs will be added dynamically -->
+        </div>
+        <button
+          type="button"
+          class="admin-btn admin-btn-ghost admin-btn-sm"
+          onclick="addTechnologyInput()"
+          style="margin-top: 0.5rem;"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Add Technology
+        </button>
+        <p class="admin-help-text">
+          e.g., React, Node.js, PostgreSQL, Docker
+        </p>
+      </div>
+
       <div class="admin-form-actions">
         <button
           type="button"
@@ -299,6 +332,71 @@ const formatDateForInput = (date: Date | string | undefined): string => {
 
 <script>
   let currentDeleteId: number | null = null;
+  let technologyCounter = 0;
+
+  function addTechnologyInput(value = "") {
+    const container = document.getElementById("technologies-container");
+    if (!container) return;
+
+    const inputGroup = document.createElement("div");
+    inputGroup.className = "tech-input-group";
+    inputGroup.style.cssText =
+      "display: flex; gap: 0.5rem; margin-bottom: 0.5rem;";
+    inputGroup.dataset.techId = String(technologyCounter++);
+
+    inputGroup.innerHTML = `
+      <input
+        type="text"
+        class="admin-input tech-input"
+        placeholder="e.g., React, Node.js"
+        value="${value}"
+        style="flex: 1;"
+      />
+      <button
+        type="button"
+        class="admin-btn admin-btn-ghost admin-btn-sm admin-btn-icon"
+        onclick="removeTechnologyInput(this)"
+        title="Remove"
+        style="color: var(--admin-danger);"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    `;
+
+    container.appendChild(inputGroup);
+  }
+
+  function removeTechnologyInput(button: HTMLButtonElement) {
+    button.closest(".tech-input-group")?.remove();
+  }
+
+  function getTechnologies(): string {
+    const inputs = document.querySelectorAll(".tech-input") as NodeListOf<HTMLInputElement>;
+    return Array.from(inputs)
+      .map((input) => input.value.trim())
+      .filter((val) => val !== "")
+      .join(",");
+  }
+
+  function setTechnologies(techString: string) {
+    const container = document.getElementById("technologies-container");
+    if (!container) return;
+
+    container.innerHTML = "";
+    
+    if (techString) {
+      const techs = techString.split(",").map((t) => t.trim()).filter((t) => t !== "");
+      techs.forEach((tech) => addTechnologyInput(tech));
+    }
+    
+    // Always have at least one empty input
+    if (container.children.length === 0) {
+      addTechnologyInput();
+    }
+  }
 
   function openAddModal() {
     const form = document.getElementById("project-form") as HTMLFormElement;
@@ -309,6 +407,8 @@ const formatDateForInput = (date: Date | string | undefined): string => {
     (form.querySelector('[name="id"]') as HTMLInputElement).value = "";
     if (title) title.textContent = "Add Project";
     if (submitBtn) submitBtn.textContent = "Create Project";
+
+    setTechnologies("");
 
     (window as any).openModal("project-modal");
   }
@@ -327,6 +427,8 @@ const formatDateForInput = (date: Date | string | undefined): string => {
       data.start_date;
     (form.querySelector('[name="end_date"]') as HTMLInputElement).value =
       data.end_date;
+
+    setTechnologies(data.technologies || "");
 
     if (title) title.textContent = "Edit Project";
     if (submitBtn) submitBtn.textContent = "Update Project";
@@ -357,6 +459,7 @@ const formatDateForInput = (date: Date | string | undefined): string => {
         url: formData.get("url") || undefined,
         start_date: formData.get("start_date"),
         end_date: formData.get("end_date") || undefined,
+        technologies: getTechnologies() || undefined,
       };
 
       if (submitBtn) submitBtn.textContent = "Saving...";
@@ -429,4 +532,11 @@ const formatDateForInput = (date: Date | string | undefined): string => {
   (window as any).openAddModal = openAddModal;
   (window as any).openEditModal = openEditModal;
   (window as any).openDeleteModal = openDeleteModal;
+  (window as any).addTechnologyInput = addTechnologyInput;
+  (window as any).removeTechnologyInput = removeTechnologyInput;
+
+  // Initialize with one empty technology input when page loads
+  document.addEventListener("DOMContentLoaded", () => {
+    addTechnologyInput();
+  });
 </script>

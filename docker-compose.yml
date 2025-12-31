@@ -21,7 +21,7 @@ services:
       - COOKIE_SAME_SITE=${COOKIE_SAME_SITE}
     volumes:
       - ./data/backend:/app/data
-      - ./data/certifications:/app/assets/certifications
+      - ./data/certifications:/app/pkg/assets/career-certifications
     networks:
       - portfolio-network
     healthcheck:
