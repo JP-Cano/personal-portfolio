@@ -3,6 +3,7 @@ export const prerender = false;
 
 import { api } from "@/api/api-client.ts";
 import ApiError from "@/components/ApiError.astro";
+import ProjectModal from "@/components/ProjectModal.astro";
 import Section from "@/components/Section.astro";
 import type { Projects } from "@/types/types.ts";
 import { API_PATHS } from "@/utils/constants.ts";
@@ -28,25 +29,30 @@ const parseTechnologies = (techString: string | undefined): string[] => {
       !hasError &&
         projects &&
         projects.length > 0 &&
-        projects.map(({ url, description, name, endDate, technologies }) => {
+        projects.map(({ url, description, name, startDate, endDate, technologies }) => {
           const isActive = !endDate;
           const techArray = parseTechnologies(technologies);
+          const projectData = JSON.stringify({
+            name,
+            description,
+            url: url || "",
+            startDate: startDate ? new Date(startDate).toISOString() : "",
+            endDate: endDate ? new Date(endDate).toISOString() : "",
+            technologies: technologies || "",
+          });
           return (
             <li class="project-item">
-              <article class="project-card">
+              <article 
+                class="project-card" 
+                data-project-card
+                data-project={projectData}
+                role="button"
+                tabindex="0"
+              >
                 <div class="card-background" />
                 <header class="project-header">
                   <div class="project-title-row">
-                    <h3 class="project-title">
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener"
-                        title={`View ${name}`}
-                      >
-                        {name}
-                      </a>
-                    </h3>
+                    <h3 class="project-title">{name}</h3>
                     {isActive ? (
                       <span class="status-badge active">
                         <span class="status-dot" />
@@ -90,6 +96,8 @@ const parseTechnologies = (techString: string | undefined): string[] => {
   </ul>
 </Section>
 
+<ProjectModal />
+
 <style>
   .projects-grid {
     display: grid;
@@ -122,6 +130,16 @@ const parseTechnologies = (techString: string | undefined): string[] => {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     box-sizing: border-box;
+    cursor: pointer;
+  }
+
+  .project-card:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  .project-card:focus:not(:focus-visible) {
+    outline: none;
   }
 
   .card-background {
@@ -169,40 +187,16 @@ const parseTechnologies = (techString: string | undefined): string[] => {
     margin: 0;
     flex: 1;
     min-width: 0;
-  }
-
-  .project-title a {
     color: var(--color-text);
-    position: relative;
-    transition: color 0.3s ease;
-    display: block;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     word-break: break-word;
+    transition: color 0.3s ease;
   }
 
-  .project-title a::after {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: linear-gradient(
-      135deg,
-      var(--color-primary) 0%,
-      var(--color-secondary) 100%
-    );
-    transition: width 0.3s ease;
-  }
-
-  .project-title a:hover {
+  .project-card:hover .project-title {
     color: var(--color-primary);
-  }
-
-  .project-title a:hover::after {
-    width: 100%;
   }
 
   .status-badge {
@@ -364,3 +358,55 @@ const parseTechnologies = (techString: string | undefined): string[] => {
     }
   }
 </style>
+
+<script>
+  function initProjectCards() {
+    const projectCards = document.querySelectorAll('[data-project-card]');
+    
+    projectCards.forEach((card) => {
+      const cardEl = card as HTMLElement;
+      
+      // Skip if already initialized
+      if (cardEl.dataset.initialized) return;
+      cardEl.dataset.initialized = 'true';
+      
+      const handleOpen = () => {
+        const projectData = cardEl.dataset.project;
+        if (projectData && (window as any).openProjectModal) {
+          try {
+            const data = JSON.parse(projectData);
+            (window as any).openProjectModal(data);
+          } catch (e) {
+            console.error('Failed to parse project data:', e);
+          }
+        }
+      };
+      
+      // Click handler
+      cardEl.addEventListener('click', handleOpen);
+      
+      // Keyboard handler for accessibility
+      cardEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleOpen();
+        }
+      });
+    });
+  }
+
+  // Initialize on load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initProjectCards);
+  } else {
+    initProjectCards();
+  }
+
+  // Re-initialize after Astro navigation
+  document.addEventListener('astro:after-swap', () => {
+    document.querySelectorAll('[data-project-card]').forEach((card) => {
+      delete (card as HTMLElement).dataset.initialized;
+    });
+    initProjectCards();
+  });
+</script>

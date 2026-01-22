@@ -1,6 +1,8 @@
 ---
 import logoDark from "@/assets/logos/logo-dark-mode.webp";
 import logoLight from "@/assets/logos/logo-white-mode.webp";
+import cvFile from "@/assets/Juan-Pablo-Cano-resume.pdf";
+import Download from "@/icons/Download.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
 ---
 
@@ -19,6 +21,16 @@ import ThemeToggle from "@/components/ThemeToggle.astro";
     </ul>
     <div class="actions">
       <ThemeToggle />
+      <a
+        href={cvFile}
+        download="Juan_Pablo_Cano_CV.pdf"
+        class="cv-download-btn"
+        title="Download CV"
+        aria-label="Download CV"
+      >
+        <Download />
+        <span class="cv-btn-text">CV</span>
+      </a>
       <button class="mobile-menu-toggle" aria-label="Toggle menu">
         <span></span>
         <span></span>
@@ -54,9 +66,14 @@ import ThemeToggle from "@/components/ThemeToggle.astro";
 
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener("click", function (e) {
-      e.preventDefault();
       const href = (this as HTMLAnchorElement).getAttribute("href");
-      if (href) {
+      // Only handle internal anchor links (starting with # followed by an ID)
+      // Skip if href has been dynamically changed to an external URL
+      if (!href || !href.startsWith("#") || href === "#") {
+        return;
+      }
+      e.preventDefault();
+      try {
         const target = document.querySelector(href);
         if (target) {
           target.scrollIntoView({
@@ -66,6 +83,8 @@ import ThemeToggle from "@/components/ThemeToggle.astro";
           navLinks?.classList.remove("active");
           menuToggle?.classList.remove("active");
         }
+      } catch {
+        // Invalid selector (e.g., URL), let the default behavior happen
       }
     });
   });
@@ -144,6 +163,39 @@ import ThemeToggle from "@/components/ThemeToggle.astro";
     display: flex;
     align-items: center;
     gap: 0.75rem;
+  }
+
+  .cv-download-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-secondary) 100%
+    );
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+  }
+
+  .cv-download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+  }
+
+  .cv-download-btn:active {
+    transform: translateY(0);
+  }
+
+  .cv-btn-text {
+    font-weight: 700;
+    letter-spacing: 0.02em;
   }
 
   .nav-links a {
@@ -254,6 +306,16 @@ import ThemeToggle from "@/components/ThemeToggle.astro";
 
     .nav-links.active {
       right: 2rem;
+    }
+
+    .cv-download-btn {
+      padding: 0.4rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .cv-download-btn svg {
+      width: 16px;
+      height: 16px;
     }
   }
 </style>

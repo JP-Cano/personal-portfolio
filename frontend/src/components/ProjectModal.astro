@@ -1,0 +1,505 @@
+---
+/**
+ * ProjectModal.astro
+ * A responsive modal component for displaying project details.
+ * Extends the existing modal pattern with portfolio-themed styling.
+ */
+---
+
+<div id="project-modal" class="project-modal-overlay" data-project-modal style="display: none;">
+  <div class="project-modal">
+    <div class="project-modal-header">
+      <div class="project-modal-title-row">
+        <h2 class="project-modal-title" data-modal-title></h2>
+        <span class="project-modal-status" data-modal-status></span>
+      </div>
+      <button
+        type="button"
+        class="project-modal-close"
+        data-modal-close
+        aria-label="Close modal"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    <div class="project-modal-body">
+      <p class="project-modal-description" data-modal-description></p>
+      
+      <div class="project-modal-technologies" data-modal-technologies></div>
+      
+      <div class="project-modal-dates">
+        <div class="project-modal-date-item">
+          <span class="date-label">Started</span>
+          <span class="date-value" data-modal-start-date></span>
+        </div>
+        <div class="project-modal-date-item" data-modal-end-date-container style="display: none;">
+          <span class="date-label">Completed</span>
+          <span class="date-value" data-modal-end-date></span>
+        </div>
+      </div>
+      
+      <a
+        href="javascript:void(0)"
+        class="project-modal-link"
+        data-modal-link
+        data-external-link
+        target="_blank"
+        rel="noopener noreferrer"
+        style="display: none;"
+      >
+        <span>Visit Project</span>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <polyline points="15 3 21 3 21 9"></polyline>
+          <line x1="10" y1="14" x2="21" y2="3"></line>
+        </svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .project-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+  }
+
+  .project-modal-overlay.visible {
+    opacity: 1;
+  }
+
+  .project-modal {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 1.25rem;
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-shadow:
+      0 0 0 1px rgba(99, 102, 241, 0.1),
+      0 20px 50px -12px rgba(0, 0, 0, 0.25),
+      0 0 60px -20px rgba(99, 102, 241, 0.2);
+    transform: scale(0.95) translateY(10px);
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .project-modal-overlay.visible .project-modal {
+    transform: scale(1) translateY(0);
+  }
+
+  .project-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .project-modal-title-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .project-modal-title {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  .project-modal-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    width: fit-content;
+  }
+
+  .project-modal-status.active {
+    background: rgba(34, 197, 94, 0.15);
+    color: #22c55e;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+  }
+
+  .project-modal-status.active::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .project-modal-status.completed {
+    background: rgba(99, 102, 241, 0.1);
+    color: var(--color-primary);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(0.8);
+    }
+  }
+
+  .project-modal-close {
+    background: transparent;
+    border: none;
+    color: var(--color-text-light);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .project-modal-close:hover {
+    background: var(--color-bg-alt);
+    color: var(--color-text);
+  }
+
+  .project-modal-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .project-modal-description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--color-text);
+    margin: 0;
+  }
+
+  .project-modal-technologies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .project-modal-technologies:empty {
+    display: none;
+  }
+
+  .project-modal-dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    padding: 1rem;
+    background: var(--color-bg-alt);
+    border-radius: 0.75rem;
+  }
+
+  .project-modal-date-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .date-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-light);
+  }
+
+  .date-value {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--color-text);
+  }
+
+  .project-modal-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.5rem;
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    border-radius: 0.75rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+  }
+
+  .project-modal-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+  }
+
+  .project-modal-link svg {
+    transition: transform 0.2s ease;
+  }
+
+  .project-modal-link:hover svg {
+    transform: translate(2px, -2px);
+  }
+
+  /* Scrollbar styling */
+  .project-modal::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .project-modal::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .project-modal::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 4px;
+  }
+
+  .project-modal::-webkit-scrollbar-thumb:hover {
+    background: var(--color-text-light);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .project-modal-overlay {
+      padding: 0.75rem;
+    }
+
+    .project-modal {
+      max-height: 85vh;
+      border-radius: 1rem;
+    }
+
+    .project-modal-header {
+      padding: 1.25rem 1.25rem 0.875rem;
+    }
+
+    .project-modal-title {
+      font-size: 1.25rem;
+    }
+
+    .project-modal-body {
+      padding: 1.25rem;
+      gap: 1.25rem;
+    }
+
+    .project-modal-description {
+      font-size: 0.95rem;
+    }
+
+    .project-modal-dates {
+      gap: 1rem;
+      padding: 0.875rem;
+    }
+  }
+
+  @media (max-width: 400px) {
+    .project-modal-overlay {
+      padding: 0.5rem;
+    }
+
+    .project-modal-header {
+      padding: 1rem 1rem 0.75rem;
+    }
+
+    .project-modal-title {
+      font-size: 1.125rem;
+    }
+
+    .project-modal-body {
+      padding: 1rem;
+      gap: 1rem;
+    }
+
+    .project-modal-link {
+      width: 100%;
+    }
+  }
+</style>
+
+<script>
+  // Project Modal Controller
+  (function initProjectModal() {
+    const modal = document.querySelector('[data-project-modal]') as HTMLElement;
+    if (!modal) return;
+
+    const closeBtn = modal.querySelector('[data-modal-close]');
+    const titleEl = modal.querySelector('[data-modal-title]') as HTMLElement;
+    const statusEl = modal.querySelector('[data-modal-status]') as HTMLElement;
+    const descriptionEl = modal.querySelector('[data-modal-description]') as HTMLElement;
+    const technologiesEl = modal.querySelector('[data-modal-technologies]') as HTMLElement;
+    const startDateEl = modal.querySelector('[data-modal-start-date]') as HTMLElement;
+    const endDateContainer = modal.querySelector('[data-modal-end-date-container]') as HTMLElement;
+    const endDateEl = modal.querySelector('[data-modal-end-date]') as HTMLElement;
+    const linkEl = modal.querySelector('[data-modal-link]') as HTMLAnchorElement;
+
+    function closeModal() {
+      modal.classList.remove('visible');
+      setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }, 250);
+    }
+
+    function openModal() {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      // Trigger reflow for animation
+      modal.offsetHeight;
+      modal.classList.add('visible');
+    }
+
+    function formatDate(dateString: string): string {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        year: 'numeric' 
+      });
+    }
+
+    function populateModal(projectData: {
+      name: string;
+      description: string;
+      url?: string;
+      startDate: string;
+      endDate?: string;
+      technologies?: string;
+    }) {
+      const { name, description, url, startDate, endDate, technologies } = projectData;
+      const isActive = !endDate;
+
+      // Title
+      titleEl.textContent = name;
+
+      // Status
+      statusEl.textContent = isActive ? 'Active' : 'Completed';
+      statusEl.className = `project-modal-status ${isActive ? 'active' : 'completed'}`;
+
+      // Description
+      descriptionEl.textContent = description;
+
+      // Technologies
+      technologiesEl.innerHTML = '';
+      if (technologies) {
+        const techArray = technologies.split(',').map(t => t.trim()).filter(t => t);
+        techArray.forEach(tech => {
+          const tag = document.createElement('span');
+          tag.className = 'tech-tag';
+          tag.textContent = tech;
+          tag.style.cssText = `
+            padding: 0.4rem 0.8rem;
+            background: var(--color-bg-alt);
+            color: var(--color-text);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: 1px solid var(--color-border);
+          `;
+          technologiesEl.appendChild(tag);
+        });
+      }
+
+      // Dates
+      startDateEl.textContent = formatDate(startDate);
+      
+      if (endDate) {
+        endDateContainer.style.display = 'flex';
+        endDateEl.textContent = formatDate(endDate);
+      } else {
+        endDateContainer.style.display = 'none';
+      }
+
+      // Link
+      if (url) {
+        linkEl.href = url;
+        linkEl.style.display = 'inline-flex';
+      } else {
+        linkEl.style.display = 'none';
+      }
+    }
+
+    // Close handlers
+    closeBtn?.addEventListener('click', closeModal);
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal.style.display !== 'none') {
+        closeModal();
+      }
+    });
+
+    // Expose global function to open modal with project data
+    (window as any).openProjectModal = (projectData: any) => {
+      populateModal(projectData);
+      openModal();
+    };
+
+    // Re-initialize after Astro navigation
+    document.addEventListener('astro:after-swap', () => {
+      // Reset modal state
+      modal.style.display = 'none';
+      modal.classList.remove('visible');
+      document.body.style.overflow = '';
+    });
+  })();
+</script>
