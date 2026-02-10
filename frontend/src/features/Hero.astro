@@ -5,7 +5,7 @@ import GitHub from "@/icons/GitHub.astro";
 import LinkedIn from "@/icons/LinkedIn.astro";
 import WorldMap from "@/icons/WorldMap.astro";
 
-const { name, label, email, phone, profiles, location } = basics;
+const { name, label, email, profiles, location } = basics;
 
 const { city, region } = location;
 
@@ -37,7 +37,6 @@ const SOCIAL_MEDIA_ICONS: Record<string, any> = {
       <div class="hero-actions">
         <ContactLinks
           email={email}
-          phone={phone}
           profiles={profiles}
           socialMediaIcons={SOCIAL_MEDIA_ICONS}
         />

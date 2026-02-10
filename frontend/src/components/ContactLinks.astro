@@ -5,12 +5,11 @@ import Phone from "@/icons/Phone.astro";
 
 interface Props {
   email?: string;
-  phone?: string;
   profiles?: typeof basics.profiles;
   socialMediaIcons: Record<string, any>;
 }
 
-const { email, phone, profiles = [], socialMediaIcons } = Astro.props;
+const { email, profiles = [], socialMediaIcons } = Astro.props;
 ---
 
 {
@@ -21,17 +20,6 @@ const { email, phone, profiles = [], socialMediaIcons } = Astro.props;
       aria-label={`Send email to ${email}`}
     >
       <Mail />
-    </a>
-  )
-}
-{
-  phone && (
-    <a
-      href={`tel:${phone}`}
-      title={`Call ${phone}`}
-      aria-label={`Call ${phone}`}
-    >
-      <Phone />
     </a>
   )
 }
