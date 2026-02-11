@@ -20,8 +20,8 @@ services:
       - COOKIE_DOMAIN=${COOKIE_DOMAIN}
       - COOKIE_SAME_SITE=${COOKIE_SAME_SITE}
     volumes:
-      - ./data/backend:/app/data
-      - ./data/certifications:/app/pkg/assets/career-certifications
+      - ./data/backend:/home/appuser/data
+      - ./data/certifications:/home/appuser/pkg/assets/career-certifications
     networks:
       - portfolio-network
     healthcheck:

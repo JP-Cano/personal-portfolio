@@ -52,7 +52,7 @@ COPY --from=builder /app/docs ./docs
 COPY --from=builder /app/pkg ./pkg
 
 # Create directories with proper permissions
-RUN mkdir -p ./data ./pkg/assets/certifications && \
+RUN mkdir -p ./data ./pkg/assets/career-certifications && \
     chown -R appuser:appuser ./data ./pkg
 
 # Switch to non-root user
