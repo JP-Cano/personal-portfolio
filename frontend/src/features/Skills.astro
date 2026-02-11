@@ -2,6 +2,10 @@
 import { skills } from "@resume";
 import Section from "@/components/Section.astro";
 import AWS from "@/icons/Aws.astro";
+import ChatGPT from "@/icons/ChatGPT.astro";
+import ClaudeCode from "@/icons/ClaudeCode.astro";
+import Codex from "@/icons/Codex.astro";
+import Cursor from "@/icons/Cursor.astro";
 import Docker from "@/icons/Docker.astro";
 import DynamoDB from "@/icons/DynamoDB.astro";
 import ElasticSearch from "@/icons/ElasticSearch.astro";
@@ -12,17 +16,17 @@ import Go from "@/icons/Go.astro";
 import GraphQL from "@/icons/Graphql.astro";
 import JavaScript from "@/icons/JavaScript.astro";
 import Jest from "@/icons/Jest.astro";
-import Jira from "@/icons/Jira.astro";
+import JetBrainsAI from "@/icons/JetBrainsAI.astro";
+import Junie from "@/icons/Junie.astro";
 import Kafka from "@/icons/Kafka.astro";
 import Kubernetes from "@/icons/Kubernetes.astro";
 import MongoDB from "@/icons/Mongo.astro";
 import NestJs from "@/icons/NestJs.astro";
 import NodeJs from "@/icons/Node.astro";
 import PostgreSQL from "@/icons/PostgreSql.astro";
+import QwenCoder from "@/icons/QwenCoder.astro";
 import React from "@/icons/React.astro";
 import Redis from "@/icons/Redis.astro";
-import Scrum from "@/icons/Scrum.astro";
-import Slack from "@/icons/Slack.astro";
 import TypeScript from "@/icons/TypeScript.astro";
 
 const SKILLS_ICONS: Record<string, any> = {
@@ -44,11 +48,15 @@ const SKILLS_ICONS: Record<string, any> = {
   Jest,
   Kubernetes,
   GitLab,
-  Slack,
   GraphQL,
-  Scrum,
-  Jira,
   React,
+  Cursor,
+  ClaudeCode,
+  JetBrainsAI,
+  Junie,
+  ChatGPT,
+  QwenCoder,
+  Codex,
 };
 
 const skillCategories = [
@@ -75,6 +83,20 @@ const skillCategories = [
     ),
   },
   {
+    title: "AI Tools",
+    skills: skills.filter((s) =>
+      [
+        "Cursor",
+        "ClaudeCode",
+        "JetBrainsAI",
+        "Junie",
+        "ChatGPT",
+        "QwenCoder",
+        "Codex",
+      ].includes(s.name)
+    ),
+  },
+  {
     title: "DevOps & Tools",
     skills: skills.filter((s) =>
       [
@@ -88,10 +110,6 @@ const skillCategories = [
         "Jest",
       ].includes(s.name)
     ),
-  },
-  {
-    title: "Collaboration",
-    skills: skills.filter((s) => ["Slack", "Jira", "Scrum"].includes(s.name)),
   },
 ];
 ---

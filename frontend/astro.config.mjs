@@ -14,6 +14,7 @@ export default defineConfig({
   },
 
   vite: {
+    assetsInclude: ["**/*.docx"],
     server: {
       allowedHosts: true,
     },

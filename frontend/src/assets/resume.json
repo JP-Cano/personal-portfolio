@@ -113,13 +113,25 @@
       "name": "Jest"
     },
     {
-      "name": "Slack"
+      "name": "Cursor"
     },
     {
-      "name": "Jira"
+      "name": "ClaudeCode"
     },
     {
-      "name": "Scrum"
+      "name": "JetBrainsAI"
+    },
+    {
+      "name": "Junie"
+    },
+    {
+      "name": "ChatGPT"
+    },
+    {
+      "name": "QwenCoder"
+    },
+    {
+      "name": "Codex"
     }
   ],
   "languages": [

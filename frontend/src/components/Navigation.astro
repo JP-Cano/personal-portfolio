@@ -1,9 +1,9 @@
 ---
+import cvFile from "@/assets/Juan-Pablo-Cano-resume-public.docx";
 import logoDark from "@/assets/logos/logo-dark-mode.webp";
 import logoLight from "@/assets/logos/logo-white-mode.webp";
-import cvFile from "@/assets/Juan-Pablo-Cano-resume.pdf";
-import Download from "@/icons/Download.astro";
 import ThemeToggle from "@/components/ThemeToggle.astro";
+import Download from "@/icons/Download.astro";
 ---
 
 <nav class="navbar">
@@ -23,7 +23,7 @@ import ThemeToggle from "@/components/ThemeToggle.astro";
       <ThemeToggle />
       <a
         href={cvFile}
-        download="Juan_Pablo_Cano_CV.pdf"
+        download="Juan_Pablo_Cano_CV.docx"
         class="cv-download-btn"
         title="Download CV"
         aria-label="Download CV"

@@ -6,7 +6,12 @@
  */
 ---
 
-<div id="project-modal" class="project-modal-overlay" data-project-modal style="display: none;">
+<div
+  id="project-modal"
+  class="project-modal-overlay"
+  data-project-modal
+  style="display: none;"
+>
   <div class="project-modal">
     <div class="project-modal-header">
       <div class="project-modal-title-row">
@@ -37,20 +42,24 @@
     </div>
     <div class="project-modal-body">
       <p class="project-modal-description" data-modal-description></p>
-      
+
       <div class="project-modal-technologies" data-modal-technologies></div>
-      
+
       <div class="project-modal-dates">
         <div class="project-modal-date-item">
           <span class="date-label">Started</span>
           <span class="date-value" data-modal-start-date></span>
         </div>
-        <div class="project-modal-date-item" data-modal-end-date-container style="display: none;">
+        <div
+          class="project-modal-date-item"
+          data-modal-end-date-container
+          style="display: none;"
+        >
           <span class="date-label">Completed</span>
           <span class="date-value" data-modal-end-date></span>
         </div>
       </div>
-      
+
       <a
         href="javascript:void(0)"
         class="project-modal-link"
@@ -72,7 +81,8 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         >
-          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+          <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
+          ></path>
           <polyline points="15 3 21 3 21 9"></polyline>
           <line x1="10" y1="14" x2="21" y2="3"></line>
         </svg>
@@ -183,7 +193,8 @@
   }
 
   @keyframes pulse {
-    0%, 100% {
+    0%,
+    100% {
       opacity: 1;
       transform: scale(1);
     }
@@ -271,7 +282,11 @@
     justify-content: center;
     gap: 0.5rem;
     padding: 0.875rem 1.5rem;
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+    background: linear-gradient(
+      135deg,
+      var(--color-primary) 0%,
+      var(--color-secondary) 100%
+    );
     color: white;
     font-weight: 600;
     font-size: 0.95rem;
@@ -373,41 +388,53 @@
 <script>
   // Project Modal Controller
   (function initProjectModal() {
-    const modal = document.querySelector('[data-project-modal]') as HTMLElement;
+    const modal = document.querySelector("[data-project-modal]") as HTMLElement;
     if (!modal) return;
 
-    const closeBtn = modal.querySelector('[data-modal-close]');
-    const titleEl = modal.querySelector('[data-modal-title]') as HTMLElement;
-    const statusEl = modal.querySelector('[data-modal-status]') as HTMLElement;
-    const descriptionEl = modal.querySelector('[data-modal-description]') as HTMLElement;
-    const technologiesEl = modal.querySelector('[data-modal-technologies]') as HTMLElement;
-    const startDateEl = modal.querySelector('[data-modal-start-date]') as HTMLElement;
-    const endDateContainer = modal.querySelector('[data-modal-end-date-container]') as HTMLElement;
-    const endDateEl = modal.querySelector('[data-modal-end-date]') as HTMLElement;
-    const linkEl = modal.querySelector('[data-modal-link]') as HTMLAnchorElement;
+    const closeBtn = modal.querySelector("[data-modal-close]");
+    const titleEl = modal.querySelector("[data-modal-title]") as HTMLElement;
+    const statusEl = modal.querySelector("[data-modal-status]") as HTMLElement;
+    const descriptionEl = modal.querySelector(
+      "[data-modal-description]"
+    ) as HTMLElement;
+    const technologiesEl = modal.querySelector(
+      "[data-modal-technologies]"
+    ) as HTMLElement;
+    const startDateEl = modal.querySelector(
+      "[data-modal-start-date]"
+    ) as HTMLElement;
+    const endDateContainer = modal.querySelector(
+      "[data-modal-end-date-container]"
+    ) as HTMLElement;
+    const endDateEl = modal.querySelector(
+      "[data-modal-end-date]"
+    ) as HTMLElement;
+    const linkEl = modal.querySelector(
+      "[data-modal-link]"
+    ) as HTMLAnchorElement;
 
     function closeModal() {
-      modal.classList.remove('visible');
+      modal.classList.remove("visible");
       setTimeout(() => {
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
+        modal.style.display = "none";
+        document.body.style.overflow = "";
       }, 250);
     }
 
     function openModal() {
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
+      modal.style.display = "flex";
+      document.body.style.overflow = "hidden";
       // Trigger reflow for animation
       modal.offsetHeight;
-      modal.classList.add('visible');
+      modal.classList.add("visible");
     }
 
     function formatDate(dateString: string): string {
-      if (!dateString) return '';
+      if (!dateString) return "";
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', { 
-        month: 'short', 
-        year: 'numeric' 
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
       });
     }
 
@@ -419,26 +446,30 @@
       endDate?: string;
       technologies?: string;
     }) {
-      const { name, description, url, startDate, endDate, technologies } = projectData;
+      const { name, description, url, startDate, endDate, technologies } =
+        projectData;
       const isActive = !endDate;
 
       // Title
       titleEl.textContent = name;
 
       // Status
-      statusEl.textContent = isActive ? 'Active' : 'Completed';
-      statusEl.className = `project-modal-status ${isActive ? 'active' : 'completed'}`;
+      statusEl.textContent = isActive ? "Active" : "Completed";
+      statusEl.className = `project-modal-status ${isActive ? "active" : "completed"}`;
 
       // Description
       descriptionEl.textContent = description;
 
       // Technologies
-      technologiesEl.innerHTML = '';
+      technologiesEl.innerHTML = "";
       if (technologies) {
-        const techArray = technologies.split(',').map(t => t.trim()).filter(t => t);
-        techArray.forEach(tech => {
-          const tag = document.createElement('span');
-          tag.className = 'tech-tag';
+        const techArray = technologies
+          .split(",")
+          .map((t) => t.trim())
+          .filter((t) => t);
+        techArray.forEach((tech) => {
+          const tag = document.createElement("span");
+          tag.className = "tech-tag";
           tag.textContent = tech;
           tag.style.cssText = `
             padding: 0.4rem 0.8rem;
@@ -455,35 +486,35 @@
 
       // Dates
       startDateEl.textContent = formatDate(startDate);
-      
+
       if (endDate) {
-        endDateContainer.style.display = 'flex';
+        endDateContainer.style.display = "flex";
         endDateEl.textContent = formatDate(endDate);
       } else {
-        endDateContainer.style.display = 'none';
+        endDateContainer.style.display = "none";
       }
 
       // Link
       if (url) {
         linkEl.href = url;
-        linkEl.style.display = 'inline-flex';
+        linkEl.style.display = "inline-flex";
       } else {
-        linkEl.style.display = 'none';
+        linkEl.style.display = "none";
       }
     }
 
     // Close handlers
-    closeBtn?.addEventListener('click', closeModal);
+    closeBtn?.addEventListener("click", closeModal);
 
-    modal.addEventListener('click', (e) => {
+    modal.addEventListener("click", (e) => {
       if (e.target === modal) {
         closeModal();
       }
     });
 
     // Escape key
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.style.display !== 'none') {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && modal.style.display !== "none") {
         closeModal();
       }
     });
@@ -495,11 +526,11 @@
     };
 
     // Re-initialize after Astro navigation
-    document.addEventListener('astro:after-swap', () => {
+    document.addEventListener("astro:after-swap", () => {
       // Reset modal state
-      modal.style.display = 'none';
-      modal.classList.remove('visible');
-      document.body.style.overflow = '';
+      modal.style.display = "none";
+      modal.classList.remove("visible");
+      document.body.style.overflow = "";
     });
   })();
 </script>

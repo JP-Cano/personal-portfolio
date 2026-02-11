@@ -283,9 +283,7 @@ const formatDateForInput = (date: Date | string | undefined): string => {
           </svg>
           Add Technology
         </button>
-        <p class="admin-help-text">
-          e.g., React, Node.js, PostgreSQL, Docker
-        </p>
+        <p class="admin-help-text">e.g., React, Node.js, PostgreSQL, Docker</p>
       </div>
 
       <div class="admin-form-actions">
@@ -374,7 +372,9 @@ const formatDateForInput = (date: Date | string | undefined): string => {
   }
 
   function getTechnologies(): string {
-    const inputs = document.querySelectorAll(".tech-input") as NodeListOf<HTMLInputElement>;
+    const inputs = document.querySelectorAll(
+      ".tech-input"
+    ) as NodeListOf<HTMLInputElement>;
     return Array.from(inputs)
       .map((input) => input.value.trim())
       .filter((val) => val !== "")
@@ -386,12 +386,15 @@ const formatDateForInput = (date: Date | string | undefined): string => {
     if (!container) return;
 
     container.innerHTML = "";
-    
+
     if (techString) {
-      const techs = techString.split(",").map((t) => t.trim()).filter((t) => t !== "");
+      const techs = techString
+        .split(",")
+        .map((t) => t.trim())
+        .filter((t) => t !== "");
       techs.forEach((tech) => addTechnologyInput(tech));
     }
-    
+
     // Always have at least one empty input
     if (container.children.length === 0) {
       addTechnologyInput();

@@ -17,7 +17,10 @@ const hasError = error !== null;
 
 const parseTechnologies = (techString: string | undefined): string[] => {
   if (!techString) return [];
-  return techString.split(",").map((tech) => tech.trim()).filter((tech) => tech !== "");
+  return techString
+    .split(",")
+    .map((tech) => tech.trim())
+    .filter((tech) => tech !== "");
 };
 ---
 
@@ -29,69 +32,71 @@ const parseTechnologies = (techString: string | undefined): string[] => {
       !hasError &&
         projects &&
         projects.length > 0 &&
-        projects.map(({ url, description, name, startDate, endDate, technologies }) => {
-          const isActive = !endDate;
-          const techArray = parseTechnologies(technologies);
-          const projectData = JSON.stringify({
-            name,
-            description,
-            url: url || "",
-            startDate: startDate ? new Date(startDate).toISOString() : "",
-            endDate: endDate ? new Date(endDate).toISOString() : "",
-            technologies: technologies || "",
-          });
-          return (
-            <li class="project-item">
-              <article 
-                class="project-card" 
-                data-project-card
-                data-project={projectData}
-                role="button"
-                tabindex="0"
-              >
-                <div class="card-background" />
-                <header class="project-header">
-                  <div class="project-title-row">
-                    <h3 class="project-title">{name}</h3>
-                    {isActive ? (
-                      <span class="status-badge active">
-                        <span class="status-dot" />
-                        Active
-                      </span>
-                    ) : (
-                      <span class="status-badge completed">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="12"
-                          height="12"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          stroke-width="3"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                        >
-                          <polyline points="20 6 9 17 4 12" />
-                        </svg>
-                        Completed
-                      </span>
-                    )}
-                  </div>
-                  <p class="project-description">{description}</p>
-                </header>
-                <footer class="project-footer">
-                  {techArray.length > 0 && (
-                    <div class="highlights">
-                      {techArray.map((tech) => {
-                        return <span class="highlight-tag">{tech}</span>;
-                      })}
+        projects.map(
+          ({ url, description, name, startDate, endDate, technologies }) => {
+            const isActive = !endDate;
+            const techArray = parseTechnologies(technologies);
+            const projectData = JSON.stringify({
+              name,
+              description,
+              url: url || "",
+              startDate: startDate ? new Date(startDate).toISOString() : "",
+              endDate: endDate ? new Date(endDate).toISOString() : "",
+              technologies: technologies || "",
+            });
+            return (
+              <li class="project-item">
+                <article
+                  class="project-card"
+                  data-project-card
+                  data-project={projectData}
+                  role="button"
+                  tabindex="0"
+                >
+                  <div class="card-background" />
+                  <header class="project-header">
+                    <div class="project-title-row">
+                      <h3 class="project-title">{name}</h3>
+                      {isActive ? (
+                        <span class="status-badge active">
+                          <span class="status-dot" />
+                          Active
+                        </span>
+                      ) : (
+                        <span class="status-badge completed">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="3"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                          Completed
+                        </span>
+                      )}
                     </div>
-                  )}
-                </footer>
-              </article>
-            </li>
-          );
-        })
+                    <p class="project-description">{description}</p>
+                  </header>
+                  <footer class="project-footer">
+                    {techArray.length > 0 && (
+                      <div class="highlights">
+                        {techArray.map((tech) => {
+                          return <span class="highlight-tag">{tech}</span>;
+                        })}
+                      </div>
+                    )}
+                  </footer>
+                </article>
+              </li>
+            );
+          }
+        )
     }
   </ul>
 </Section>
@@ -361,15 +366,15 @@ const parseTechnologies = (techString: string | undefined): string[] => {
 
 <script>
   function initProjectCards() {
-    const projectCards = document.querySelectorAll('[data-project-card]');
-    
+    const projectCards = document.querySelectorAll("[data-project-card]");
+
     projectCards.forEach((card) => {
       const cardEl = card as HTMLElement;
-      
+
       // Skip if already initialized
       if (cardEl.dataset.initialized) return;
-      cardEl.dataset.initialized = 'true';
-      
+      cardEl.dataset.initialized = "true";
+
       const handleOpen = () => {
         const projectData = cardEl.dataset.project;
         if (projectData && (window as any).openProjectModal) {
@@ -377,17 +382,17 @@ const parseTechnologies = (techString: string | undefined): string[] => {
             const data = JSON.parse(projectData);
             (window as any).openProjectModal(data);
           } catch (e) {
-            console.error('Failed to parse project data:', e);
+            console.error("Failed to parse project data:", e);
           }
         }
       };
-      
+
       // Click handler
-      cardEl.addEventListener('click', handleOpen);
-      
+      cardEl.addEventListener("click", handleOpen);
+
       // Keyboard handler for accessibility
-      cardEl.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
+      cardEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           handleOpen();
         }
@@ -396,15 +401,15 @@ const parseTechnologies = (techString: string | undefined): string[] => {
   }
 
   // Initialize on load
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initProjectCards);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initProjectCards);
   } else {
     initProjectCards();
   }
 
   // Re-initialize after Astro navigation
-  document.addEventListener('astro:after-swap', () => {
-    document.querySelectorAll('[data-project-card]').forEach((card) => {
+  document.addEventListener("astro:after-swap", () => {
+    document.querySelectorAll("[data-project-card]").forEach((card) => {
       delete (card as HTMLElement).dataset.initialized;
     });
     initProjectCards();
