@@ -3,11 +3,9 @@ import { basics } from "@resume";
 import ContactLinks from "@/components/ContactLinks.astro";
 import GitHub from "@/icons/GitHub.astro";
 import LinkedIn from "@/icons/LinkedIn.astro";
-import WorldMap from "@/icons/WorldMap.astro";
 
 const { name, label, email, profiles, location } = basics;
-
-const { city, region } = location;
+const { city, region, countryCode } = location;
 
 const SOCIAL_MEDIA_ICONS: Record<string, any> = {
   LinkedIn,
@@ -15,350 +13,153 @@ const SOCIAL_MEDIA_ICONS: Record<string, any> = {
 };
 ---
 
-<section class="hero" id="hero">
-  <div class="hero-container">
-    <div class="hero-content">
-      <div class="greeting">
-        <span>Hi, I'm</span>
-      </div>
-      <h1 class="hero-title">
-        <span class="name-gradient">{name}</span>
+<section
+  class="relative flex min-h-screen items-center px-8 pt-36 pb-20 max-[768px]:px-5 max-[768px]:pt-28 max-[768px]:pb-12"
+  id="hero"
+>
+  <div
+    class="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-center gap-10 min-[980px]:grid-cols-[1.05fr_0.95fr] min-[980px]:gap-14"
+  >
+    <div class="animate-[slide-in-left_0.7s_ease]">
+      <span class="eyebrow eyebrow-accent mb-5 block">
+        Backend · Security · Fullstack
+      </span>
+      <h1 class="aurora-text m-0 mb-2 text-[clamp(2.6rem,6vw,4.25rem)]">
+        {name}
       </h1>
-      <h2 class="hero-subtitle">{label}</h2>
-      <p class="hero-description">
-        Passionate about building scalable web applications and exploring
-        cutting-edge technologies.
+      <p
+        class="text-secondary m-0 mb-6 font-sans text-[clamp(1rem,2vw,1.2rem)] font-medium"
+      >
+        {label}
       </p>
-      <div class="hero-location">
-        <WorldMap />
-        <span>{city}, {region}</span>
-      </div>
+      <p class="m-0 mb-8 max-w-[46ch] text-[1.08rem]">
+        I&rsquo;m a senior software engineer working across backend, full-stack,
+        and application security, designing reliable services, clean APIs, and
+        the systems that keep them safe.
+      </p>
 
-      <div class="hero-actions">
+      <dl class="border-border mb-8 flex flex-col gap-2.5 border-l pl-4">
+        <div class="flex items-baseline gap-3.5">
+          <dt class="text-secondary min-w-14 font-mono text-[0.78rem]">Role</dt>
+          <dd class="text-text m-0 text-[0.95rem]">
+            Backend / Application Security / Fullstack
+          </dd>
+        </div>
+        <div class="flex items-baseline gap-3.5">
+          <dt class="text-secondary min-w-14 font-mono text-[0.78rem]">
+            Stack
+          </dt>
+          <dd class="text-text m-0 text-[0.95rem]">
+            NodeJs · TypeScript · Amazon Web Services · AppSec
+          </dd>
+        </div>
+        <div class="flex items-baseline gap-3.5">
+          <dt class="text-secondary min-w-14 font-mono text-[0.78rem]">
+            Based
+          </dt>
+          <dd class="text-text m-0 text-[0.95rem]">
+            {city}, {region} &mdash; {countryCode}
+          </dd>
+        </div>
+      </dl>
+
+      <div class="flex flex-wrap gap-3">
         <ContactLinks
           email={email}
           profiles={profiles}
           socialMediaIcons={SOCIAL_MEDIA_ICONS}
         />
       </div>
-
-      <div class="scroll-indicator">
-        <div class="mouse">
-          <div class="wheel"></div>
-        </div>
-        <span>Scroll to explore</span>
-      </div>
     </div>
 
-    <div class="hero-visual">
-      <div class="floating-card card-1">
-        <div class="card-icon">💻</div>
-        <div class="card-text">Clean Code</div>
+    <div
+      class="relative h-[460px] animate-[fade-in-soft_0.8s_ease_0.4s_backwards] max-[980px]:flex max-[980px]:h-auto max-[980px]:flex-wrap max-[980px]:justify-center max-[980px]:gap-4"
+    >
+      <div
+        class="card absolute top-[8%] right-[8%] flex animate-[float_3s_ease-in-out_infinite] items-center gap-3.5 px-6 py-5 shadow-[0_10px_40px_rgba(0,0,0,0.12)] max-[980px]:static"
+      >
+        <span
+          class="from-primary to-secondary flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-[0_8px_20px_-8px_var(--color-primary)]"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect x="2" y="2" width="20" height="8" rx="2"></rect>
+            <rect x="2" y="14" width="20" height="8" rx="2"></rect>
+            <line x1="6" y1="6" x2="6.01" y2="6"></line>
+            <line x1="6" y1="18" x2="6.01" y2="18"></line>
+          </svg>
+        </span>
+        <span class="text-text font-display font-semibold">Backend</span>
       </div>
-      <div class="floating-card card-2">
-        <div class="card-icon">🚀</div>
-        <div class="card-text">Performance</div>
+
+      <div
+        class="card absolute top-[42%] right-[28%] flex animate-[float_3s_ease-in-out_1s_infinite] items-center gap-3.5 px-6 py-5 shadow-[0_10px_40px_rgba(0,0,0,0.12)] max-[980px]:static"
+      >
+        <span
+          class="from-secondary to-accent flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-[0_8px_20px_-8px_var(--color-secondary)]"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+        </span>
+        <span class="text-text font-display font-semibold">Security</span>
       </div>
-      <div class="floating-card card-3">
-        <div class="card-icon">🎨</div>
-        <div class="card-text">Design</div>
+
+      <div
+        class="card absolute right-[4%] bottom-[12%] flex animate-[float_3s_ease-in-out_0.5s_infinite] items-center gap-3.5 px-6 py-5 shadow-[0_10px_40px_rgba(0,0,0,0.12)] max-[980px]:static"
+      >
+        <span
+          class="from-accent to-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-[0_8px_20px_-8px_var(--color-accent)]"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="16 18 22 12 16 6"></polyline>
+            <polyline points="8 6 2 12 8 18"></polyline>
+          </svg>
+        </span>
+        <span class="text-text font-display font-semibold">Fullstack</span>
       </div>
     </div>
   </div>
+
+  <a
+    class="text-text-light absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1.5 font-mono text-[0.75rem] min-[980px]:flex"
+    href="#about"
+  >
+    <span>scroll</span>
+    <span class="animate-[nudge_1.8s_ease_infinite]" aria-hidden="true">
+      &darr;
+    </span>
+  </a>
 </section>
-
-<style>
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8rem 2rem 4rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .hero-container {
-    max-width: 1400px;
-    width: 100%;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
-  }
-
-  .hero-content {
-    z-index: 1;
-  }
-
-  .greeting {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.2rem;
-    color: var(--color-text-light);
-    margin-bottom: 1rem;
-    animation: slideInLeft 0.6s ease;
-  }
-
-  @keyframes wave {
-    0%,
-    100% {
-      transform: rotate(0deg);
-    }
-    10%,
-    30% {
-      transform: rotate(14deg);
-    }
-    20% {
-      transform: rotate(-8deg);
-    }
-    40% {
-      transform: rotate(14deg);
-    }
-    50% {
-      transform: rotate(0deg);
-    }
-  }
-
-  .hero-title {
-    margin-bottom: 0.5rem;
-    animation: slideInLeft 0.6s ease 0.1s backwards;
-  }
-
-  .name-gradient {
-    background: linear-gradient(
-      135deg,
-      var(--color-primary) 0%,
-      var(--color-secondary) 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .hero-subtitle {
-    color: var(--color-text);
-    font-weight: 600;
-    margin-bottom: 1.5rem;
-    animation: slideInLeft 0.6s ease 0.2s backwards;
-  }
-
-  .hero-description {
-    font-size: 1.1rem;
-    max-width: 600px;
-    margin-bottom: 2rem;
-    animation: slideInLeft 0.6s ease 0.3s backwards;
-  }
-
-  .hero-location {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text-light);
-    margin-bottom: 2rem;
-    font-size: 1rem;
-    animation: slideInLeft 0.6s ease 0.4s backwards;
-  }
-
-  .hero-actions {
-    animation: slideInLeft 0.6s ease 0.5s backwards;
-  }
-
-  .scroll-indicator {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    color: var(--color-text-light);
-    font-size: 0.85rem;
-    opacity: 0.6;
-    animation: fadeIn 1s ease 1s backwards;
-  }
-
-  .mouse {
-    width: 24px;
-    height: 40px;
-    border: 2px solid var(--color-text-light);
-    border-radius: 12px;
-    position: relative;
-  }
-
-  .wheel {
-    width: 3px;
-    height: 8px;
-    background: var(--color-text-light);
-    border-radius: 2px;
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    animation: scroll 1.5s ease infinite;
-  }
-
-  @keyframes scroll {
-    0% {
-      top: 8px;
-      opacity: 1;
-    }
-    100% {
-      top: 24px;
-      opacity: 0;
-    }
-  }
-
-  .hero-visual {
-    position: relative;
-    height: 500px;
-    animation: fadeIn 0.8s ease 0.6s backwards;
-  }
-
-  .floating-card {
-    position: absolute;
-    background: var(--color-surface);
-    padding: 1.5rem 2rem;
-    border-radius: 16px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    transition: var(--transition);
-  }
-
-  .floating-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  }
-
-  .card-icon {
-    font-size: 2rem;
-  }
-
-  .card-text {
-    font-weight: 600;
-    color: var(--color-text);
-  }
-
-  .card-1 {
-    top: 10%;
-    right: 10%;
-    animation: float 3s ease infinite;
-  }
-
-  .card-2 {
-    top: 45%;
-    right: 25%;
-    animation: float 3s ease infinite 1s;
-  }
-
-  .card-3 {
-    bottom: 15%;
-    right: 5%;
-    animation: float 3s ease infinite 0.5s;
-  }
-
-  @keyframes float {
-    0%,
-    100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-20px);
-    }
-  }
-
-  @keyframes slideInLeft {
-    from {
-      opacity: 0;
-      transform: translateX(-30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @media (width <= 1024px) {
-    .hero-container {
-      grid-template-columns: 1fr;
-      gap: 3rem;
-    }
-
-    .hero-visual {
-      height: auto;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .floating-card {
-      position: relative;
-      top: auto;
-      right: auto;
-      bottom: auto;
-      left: auto;
-    }
-
-    .card-1 {
-      animation: float 3s ease infinite;
-    }
-
-    .card-2 {
-      animation: float 3s ease infinite 1s;
-    }
-
-    .card-3 {
-      animation: float 3s ease infinite 0.5s;
-    }
-
-    .scroll-indicator {
-      display: none;
-    }
-  }
-
-  @media (width <= 768px) {
-    .hero {
-      padding: 6rem 1.5rem 3rem;
-    }
-
-    .hero-title {
-      font-size: 2.5rem;
-    }
-
-    .hero-subtitle {
-      font-size: 1.5rem;
-    }
-
-    .hero-description {
-      font-size: 1rem;
-    }
-
-    .floating-card {
-      padding: 1rem 1.5rem;
-    }
-
-    .card-icon {
-      font-size: 1.5rem;
-    }
-
-    .card-text {
-      font-size: 0.9rem;
-    }
-  }
-</style>

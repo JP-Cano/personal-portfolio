@@ -6,10 +6,14 @@ const { hasError, error, data } = Astro.props;
 
 {
   hasError && (
-    <div class="error-state">
-      <p>⚠️ Unable to load information. Please try again later.</p>
+    <div class="mb-8 rounded-[var(--radius)] border border-[#e5614b]/40 bg-[#e5614b]/10 px-6 py-8 text-center">
+      <p class="m-0 font-semibold text-[#e5614b]">
+        Unable to load information. Please try again later.
+      </p>
       {ENVIRONMENT === "local" && (
-        <p class="error-details">{error?.toString()}</p>
+        <p class="mt-4 rounded-sm bg-black/20 p-2 font-mono text-sm break-all text-[#e5614b]">
+          {error?.toString()}
+        </p>
       )}
     </div>
   )
@@ -17,44 +21,8 @@ const { hasError, error, data } = Astro.props;
 
 {
   !hasError && (!data || data.length === 0) && (
-    <div class="empty-state">
-      <p>No data to display yet.</p>
+    <div class="text-text-light px-8 py-12 text-center">
+      <p class="m-0 text-lg">No data to display yet.</p>
     </div>
   )
 }
-
-<style>
-  .error-state {
-    background: #fee2e2;
-    border: 2px solid #ef4444;
-    border-radius: 12px;
-    padding: 2rem;
-    margin-bottom: 2rem;
-    text-align: center;
-  }
-
-  .error-state p {
-    color: #991b1b;
-    margin: 0;
-    font-weight: 600;
-    font-size: 1.1rem;
-  }
-
-  .error-details {
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    color: #7f1d1d;
-    font-family: monospace;
-    background: rgba(0, 0, 0, 0.05);
-    padding: 0.5rem;
-    border-radius: 4px;
-    word-break: break-all;
-  }
-
-  .empty-state {
-    text-align: center;
-    padding: 3rem 2rem;
-    color: var(--color-text-light);
-    font-size: 1.1rem;
-  }
-</style>

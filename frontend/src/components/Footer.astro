@@ -1,207 +1,90 @@
 ---
 import { basics } from "@resume";
+import ContactLinks from "@/components/ContactLinks.astro";
 import GitHub from "@/icons/GitHub.astro";
 import LinkedIn from "@/icons/LinkedIn.astro";
-import Mail from "@/icons/Mail.astro";
 
 const { email, profiles } = basics;
 const currentYear = new Date().getFullYear();
 
-const linkedIn = profiles.find((profile) => profile.network === "LinkedIn");
-const github = profiles.find((profile) => profile.network === "GitHub");
+const SOCIAL_MEDIA_ICONS: Record<string, any> = {
+  LinkedIn,
+  GitHub,
+};
 ---
 
-<footer class="site-footer" id="contact">
-  <div class="footer-container">
-    <div class="footer-content">
-      <div class="footer-section">
-        <h3>Juan Pablo Cano</h3>
-        <p>
-          Software Developer passionate about creating amazing web experiences
+<footer
+  class="relative mt-24 bg-[var(--footer-grad-start)] px-8 pt-16 pb-8 text-[var(--footer-text)] max-md:px-6 max-md:pt-12 max-md:pb-6"
+  id="contact"
+>
+  <div class="aurora-rule absolute top-0 left-0 w-full"></div>
+  <div class="mx-auto max-w-[1180px]">
+    <div
+      class="mb-12 grid [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))] gap-12 max-md:grid-cols-1 max-md:gap-8"
+    >
+      <div>
+        <span class="eyebrow mb-[0.6rem] block">Contact</span>
+        <h3 class="mb-[0.85rem] text-[1.4rem]">
+          <span class="aurora-text">Juan Pablo Cano</span>
+        </h3>
+        <p class="max-w-[36ch] leading-[1.6] text-[var(--footer-subtle)]">
+          Backend engineer focused on reliable APIs, event pipelines, and the
+          services behind them.
         </p>
       </div>
 
-      <div class="footer-section">
-        <h4>Quick Links</h4>
-        <ul>
-          <li><a href="#about">About</a></li>
-          <li><a href="#experience">Experience</a></li>
-          <li><a href="#projects">Projects</a></li>
-          <li><a href="#skills">Skills</a></li>
+      <div>
+        <h4 class="eyebrow mb-[1.1rem] block">Navigation</h4>
+        <ul class="m-0 p-0">
+          <li class="mb-[0.55rem]">
+            <a
+              href="#about"
+              class="hover:text-primary font-sans text-[0.9rem] text-[var(--footer-subtle)] transition-colors duration-300"
+              >About</a
+            >
+          </li>
+          <li class="mb-[0.55rem]">
+            <a
+              href="#experience"
+              class="hover:text-primary font-sans text-[0.9rem] text-[var(--footer-subtle)] transition-colors duration-300"
+              >Experience</a
+            >
+          </li>
+          <li class="mb-[0.55rem]">
+            <a
+              href="#projects"
+              class="hover:text-primary font-sans text-[0.9rem] text-[var(--footer-subtle)] transition-colors duration-300"
+              >Projects</a
+            >
+          </li>
+          <li class="mb-[0.55rem]">
+            <a
+              href="#skills"
+              class="hover:text-primary font-sans text-[0.9rem] text-[var(--footer-subtle)] transition-colors duration-300"
+              >Skills</a
+            >
+          </li>
         </ul>
       </div>
 
-      <div class="footer-section">
-        <h4>Connect</h4>
-        <div class="social-links">
-          {
-            linkedIn && (
-              <a
-                href={linkedIn.url}
-                target="_blank"
-                rel="noopener"
-                aria-label="LinkedIn"
-              >
-                <LinkedIn />
-              </a>
-            )
-          }
-          {
-            github && (
-              <a
-                href={github.url}
-                target="_blank"
-                rel="noopener"
-                aria-label="GitHub"
-              >
-                <GitHub />
-              </a>
-            )
-          }
-          <a href={`mailto:${email}`} aria-label="Email">
-            <Mail />
-          </a>
+      <div>
+        <h4 class="eyebrow mb-[1.1rem] block">Connect</h4>
+        <div class="mt-1 flex flex-wrap gap-2">
+          <ContactLinks
+            email={email}
+            profiles={profiles}
+            socialMediaIcons={SOCIAL_MEDIA_ICONS}
+          />
         </div>
       </div>
     </div>
 
-    <div class="footer-bottom">
-      <p>&copy; {currentYear} Juan Pablo Cano. All rights reserved.</p>
+    <div class="border-border border-t pt-8">
+      <p
+        class="m-0 font-mono text-[0.78rem] tracking-[0.02em] text-[var(--footer-subtle)]"
+      >
+        &copy; {currentYear} Juan Pablo Cano. All rights reserved.
+      </p>
     </div>
   </div>
 </footer>
-
-<style>
-  .site-footer {
-    background: linear-gradient(
-      135deg,
-      var(--footer-grad-start) 0%,
-      var(--footer-grad-end) 100%
-    );
-    color: var(--footer-text);
-    padding: 4rem 2rem 2rem;
-    margin-top: 6rem;
-  }
-
-  .footer-container {
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-
-  .footer-content {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 3rem;
-    margin-bottom: 3rem;
-  }
-
-  .footer-section h3 {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    background: linear-gradient(
-      135deg,
-      var(--footer-heading-grad-start) 0%,
-      var(--footer-heading-grad-end) 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .footer-section h4 {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-    color: var(--footer-heading-grad-end);
-  }
-
-  .footer-section p {
-    color: var(--footer-subtle);
-    line-height: 1.6;
-  }
-
-  .footer-section ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .footer-section ul li {
-    margin-bottom: 0.5rem;
-  }
-
-  .footer-section ul li a {
-    color: var(--footer-subtle);
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
-
-  .footer-section ul li a:hover {
-    color: var(--footer-text);
-  }
-
-  .social-links {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  .social-links a {
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 50%;
-    transition: all 0.3s ease;
-    color: #fff;
-  }
-
-  .social-links a:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-3px);
-  }
-
-  .footer-bottom {
-    text-align: center;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-
-  .footer-bottom p {
-    color: #a5b4fc;
-    margin: 0.5rem 0;
-    font-size: 0.9rem;
-  }
-
-  .heart {
-    color: #ef4444;
-    animation: heartbeat 1.5s ease infinite;
-  }
-
-  @keyframes heartbeat {
-    0%,
-    100% {
-      transform: scale(1);
-    }
-    10%,
-    30% {
-      transform: scale(1.1);
-    }
-    20%,
-    40% {
-      transform: scale(1);
-    }
-  }
-
-  @media (width <= 768px) {
-    .site-footer {
-      padding: 3rem 1.5rem 1.5rem;
-    }
-
-    .footer-content {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-  }
-</style>

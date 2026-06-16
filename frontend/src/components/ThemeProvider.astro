@@ -7,38 +7,43 @@
     const THEME_KEY = "theme";
     const root = document.documentElement;
 
-    let stored;
-    try {
-      stored = localStorage.getItem(THEME_KEY);
-    } catch (_) {}
+    function resolveTheme() {
+      let stored;
+      try {
+        stored = localStorage.getItem(THEME_KEY);
+      } catch (_) {
+        /* localStorage unavailable */
+      }
 
-    let prefersDark = false;
-    try {
-      prefersDark =
-        window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches;
-    } catch (_) {}
+      let prefersDark = false;
+      try {
+        prefersDark =
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches;
+      } catch (_) {
+        /* matchMedia unavailable */
+      }
 
-    const initial = stored || (prefersDark ? "dark" : "light");
-    if (root.getAttribute("data-theme") !== initial) {
-      root.setAttribute("data-theme", initial);
+      return stored || (prefersDark ? "dark" : "light");
     }
 
-    let meta = document.querySelector('meta[name="color-scheme"]');
-    if (!meta) {
-      meta = document.createElement("meta");
-      meta.setAttribute("name", "color-scheme");
-      document.head.appendChild(meta);
-    }
+    function applyTheme() {
+      const theme = resolveTheme();
+      if (root.getAttribute("data-theme") !== theme) {
+        root.setAttribute("data-theme", theme);
+      }
 
-    function applyColorScheme() {
+      let meta = document.querySelector('meta[name="color-scheme"]');
+      if (!meta) {
+        meta = document.createElement("meta");
+        meta.setAttribute("name", "color-scheme");
+        document.head.appendChild(meta);
+      }
       meta.setAttribute(
         "content",
-        root.getAttribute("data-theme") === "dark" ? "dark light" : "light dark"
+        theme === "dark" ? "dark light" : "light dark"
       );
     }
-
-    applyColorScheme();
 
     function toggle() {
       const next =
@@ -46,41 +51,72 @@
       root.setAttribute("data-theme", next);
       try {
         localStorage.setItem(THEME_KEY, next);
-      } catch (_) {}
-      applyColorScheme();
+      } catch (_) {
+        /* localStorage unavailable */
+      }
+      const meta = document.querySelector('meta[name="color-scheme"]');
+      if (meta) {
+        meta.setAttribute(
+          "content",
+          next === "dark" ? "dark light" : "light dark"
+        );
+      }
       window.dispatchEvent(
         new CustomEvent("theme:changed", { detail: { theme: next } })
       );
     }
+
+    // Apply theme on initial load
+    applyTheme();
 
     window.addEventListener("theme:toggle", toggle);
 
     window.addEventListener("storage", function (e) {
       if (e.key === THEME_KEY && e.newValue) {
         root.setAttribute("data-theme", e.newValue);
-        applyColorScheme();
+        const meta = document.querySelector('meta[name="color-scheme"]');
+        if (meta) {
+          meta.setAttribute(
+            "content",
+            e.newValue === "dark" ? "dark light" : "light dark"
+          );
+        }
         window.dispatchEvent(
           new CustomEvent("theme:changed", { detail: { theme: e.newValue } })
         );
       }
     });
 
+    // Re-apply theme after View Transitions (Astro ClientRouter)
+    document.addEventListener("astro:page-load", applyTheme);
+
     try {
       const media = window.matchMedia("(prefers-color-scheme: dark)");
-      media.addEventListener &&
+      if (media.addEventListener) {
         media.addEventListener("change", function (e) {
           try {
-            stored = localStorage.getItem(THEME_KEY);
-          } catch (_) {}
+            const stored = localStorage.getItem(THEME_KEY);
+          } catch (_) {
+            /* localStorage unavailable */
+          }
           if (!stored) {
             const next = e.matches ? "dark" : "light";
             root.setAttribute("data-theme", next);
-            applyColorScheme();
+            const meta = document.querySelector('meta[name="color-scheme"]');
+            if (meta) {
+              meta.setAttribute(
+                "content",
+                next === "dark" ? "dark light" : "light dark"
+              );
+            }
             window.dispatchEvent(
               new CustomEvent("theme:changed", { detail: { theme: next } })
             );
           }
         });
-    } catch (_) {}
+      }
+    } catch (_) {
+      /* matchMedia unavailable */
+    }
   })();
 </script>

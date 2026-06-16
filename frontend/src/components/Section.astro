@@ -1,97 +1,37 @@
 ---
-const { title, id } = Astro.props;
+interface Props {
+  title?: string;
+  id?: string;
+  index?: number;
+}
+
+const { title, id, index } = Astro.props;
+const sectionNumber = index != null ? String(index).padStart(2, "0") : null;
 ---
 
-<section class="content-section fade-in" id={id}>
-  <div class="section-container">
+<section
+  class="content-section fade-in relative px-5 py-16 md:px-8 md:py-24"
+  id={id}
+>
+  <div class="mx-auto w-full max-w-[1180px]">
     {
       title && (
-        <div class="section-header">
-          <h2 class="section-title">{title}</h2>
-          <div class="title-decoration" />
-        </div>
+        <header class="relative mb-10 text-center md:mb-14">
+          <span class="section-glow" aria-hidden="true" />
+          {sectionNumber && (
+            <span class="eyebrow eyebrow-accent relative z-[1] mb-3 block">
+              {sectionNumber}
+            </span>
+          )}
+          <h2 class="relative z-[1] m-0 text-[clamp(1.9rem,4vw,2.6rem)]">
+            {title}
+          </h2>
+          <span class="aurora-rule relative z-[1] mx-auto mt-6 block max-w-[80px]" />
+        </header>
       )
     }
-    <div class="section-content">
+    <div>
       <slot />
     </div>
   </div>
 </section>
-
-<style>
-  .content-section {
-    padding: 6rem 2rem;
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  .content-section:nth-child(even) {
-    background: var(--color-bg-alt);
-  }
-
-  .section-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .section-header {
-    text-align: center;
-    margin-bottom: 4rem;
-  }
-
-  .section-title {
-    font-size: clamp(2rem, 4vw, 2.5rem);
-    color: var(--color-text);
-    margin-bottom: 1rem;
-    position: relative;
-    display: inline-block;
-  }
-
-  .title-decoration {
-    width: 60px;
-    height: 4px;
-    background: linear-gradient(
-      135deg,
-      var(--color-primary) 0%,
-      var(--color-secondary) 100%
-    );
-    margin: 0 auto;
-    border-radius: 2px;
-  }
-
-  .section-content {
-    animation: fadeInUp 0.8s ease;
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @media (width <= 768px) {
-    .content-section {
-      padding: 4rem 1.5rem;
-    }
-
-    .section-header {
-      margin-bottom: 3rem;
-    }
-  }
-
-  @media (width <= 400px) {
-    .content-section {
-      padding: 3rem 1rem;
-    }
-
-    .section-header {
-      margin-bottom: 2rem;
-    }
-  }
-</style>

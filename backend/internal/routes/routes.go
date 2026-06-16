@@ -12,6 +12,7 @@ import (
 func SetupRoutes(
 	router *gin.Engine,
 	experienceHandler *handlers.ExperienceHandler,
+	experienceClientHandler *handlers.ExperienceClientHandler,
 	projectHandler *handlers.ProjectHandler,
 	uploadCertificatesHandler *handlers.CareerCertificationHandler,
 	authHandler *handlers.AuthHandler,
@@ -66,6 +67,30 @@ func SetupRoutes(
 				middleware.AuthMiddleware(authService),
 				experienceHandler.DeleteExperience,
 			)
+
+			// Experience Clients sub-resource
+			clientsGroup := experiences.Group("/:id/clients")
+			{
+				// Public routes
+				clientsGroup.GET("", experienceClientHandler.GetClientsByExperienceID)
+				clientsGroup.GET("/:clientId", experienceClientHandler.GetClientByID)
+
+				// Protected routes
+				clientsGroup.POST("",
+					middleware.AuthMiddleware(authService),
+					middleware.ValidateRequest[dto.ExperienceClientRequest](),
+					experienceClientHandler.CreateClient,
+				)
+				clientsGroup.PATCH("/:clientId",
+					middleware.AuthMiddleware(authService),
+					middleware.ValidateRequest[dto.UpdateExperienceClientRequest](),
+					experienceClientHandler.UpdateClient,
+				)
+				clientsGroup.DELETE("/:clientId",
+					middleware.AuthMiddleware(authService),
+					experienceClientHandler.DeleteClient,
+				)
+			}
 		}
 
 		// Project routes

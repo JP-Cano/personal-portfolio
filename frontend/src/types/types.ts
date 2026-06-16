@@ -13,11 +13,34 @@ export const experienceSchema = z.object({
   url: z.url().optional(),
   location: z.string(),
   type: z.enum(Object.values(WorkType)),
-  startDate: z.date(),
-  endDate: z.date().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date().optional(),
   description: z.string(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+export const experienceClientSchema = z.object({
+  id: z.number().positive(),
+  experienceId: z.number().positive(),
+  name: z.string(),
+  url: z.url().optional(),
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date().optional(),
+  description: z.string().optional(),
+  achievements: z.array(z.string()).default([]),
+  responsibilities: z.array(z.string()).default([]),
+  technologies: z.array(z.string()).default([]),
+  createdAt: z.coerce.date(),
+  updatedAt: z.coerce.date(),
+});
+
+// Full detail for a single experience: the experience fields plus its nested
+// clients. Dates are coerced so this schema can safeParse a raw JSON response.
+export const experienceDetailSchema = experienceSchema.extend({
+  startDate: z.coerce.date(),
+  endDate: z.coerce.date().optional(),
+  clients: z.array(experienceClientSchema).default([]),
 });
 
 export const projectSchema = z.object({
@@ -61,6 +84,10 @@ export const uploadResponseSchema = z.object({
 
 export type Experience = z.infer<typeof experienceSchema>;
 export type Experiences = Array<Experience>;
+
+export type ExperienceClient = z.infer<typeof experienceClientSchema>;
+export type ExperienceClients = Array<ExperienceClient>;
+export type ExperienceDetail = z.infer<typeof experienceDetailSchema>;
 
 export type Project = z.infer<typeof projectSchema>;
 export type Projects = Array<Project>;

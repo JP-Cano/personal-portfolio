@@ -18,6 +18,7 @@ const { email, profiles = [], socialMediaIcons } = Astro.props;
       href={`mailto:${email}`}
       title={`Send email to ${email}`}
       aria-label={`Send email to ${email}`}
+      class="bg-surface border-border text-text-light hover:text-primary hover:border-primary inline-flex h-10 w-10 items-center justify-center rounded-sm border p-1.5 transition-[color,border-color,transform] duration-[250ms] hover:-translate-y-0.5 motion-reduce:hover:translate-y-0"
     >
       <Mail />
     </a>
@@ -35,30 +36,10 @@ const { email, profiles = [], socialMediaIcons } = Astro.props;
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`Visit my ${network} profile`}
+        class="bg-surface border-border text-text-light hover:text-primary hover:border-primary inline-flex h-10 w-10 items-center justify-center rounded-sm border p-1.5 transition-[color,border-color,transform] duration-[250ms] hover:-translate-y-0.5 motion-reduce:hover:translate-y-0"
       >
         <Icon />
       </a>
     );
   })
 }
-
-<style>
-  a {
-    color: #777;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid #eee;
-    padding: 4px;
-    height: 32px;
-    width: 32px;
-    border-radius: 6px;
-    transition: all 0.3s ease;
-    margin-right: 5px;
-  }
-
-  a:hover {
-    background: #eee;
-    border: 1px solid #ddd;
-  }
-</style>

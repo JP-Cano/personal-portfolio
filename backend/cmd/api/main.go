@@ -71,7 +71,7 @@ func main() {
 
 	db := database.GetDB()
 
-	projectHandler, experienceHandler, careerCertificationHandler, authHandler, authService := registerDependencies(db)
+	projectHandler, experienceHandler, experienceClientHandler, careerCertificationHandler, authHandler, authService := registerDependencies(db)
 
 	cleanExpiredSessions(authService)
 
@@ -110,6 +110,7 @@ func main() {
 	routes.SetupRoutes(
 		r,
 		experienceHandler,
+		experienceClientHandler,
 		projectHandler,
 		careerCertificationHandler,
 		authHandler,
@@ -192,14 +193,20 @@ func configDatabaseDriver() database.Config {
 func registerDependencies(db *gorm.DB) (
 	*handlers.ProjectHandler,
 	*handlers.ExperienceHandler,
+	*handlers.ExperienceClientHandler,
 	*handlers.CareerCertificationHandler,
 	*handlers.AuthHandler,
 	services.AuthService,
 ) {
+	// Experience Client dependencies (created first for injection into ExperienceHandler)
+	experienceClientRepo := repository.NewExperienceClientRepository(db)
+	experienceClientService := services.NewExperienceClientService(experienceClientRepo)
+	experienceClientHandler := handlers.NewExperienceClientHandler(experienceClientService)
+
 	// Experience dependencies
 	experienceRepo := repository.NewExperienceRepository(db)
 	experienceService := services.NewExperienceService(experienceRepo)
-	experienceHandler := handlers.NewExperienceHandler(experienceService)
+	experienceHandler := handlers.NewExperienceHandler(experienceService, experienceClientService)
 
 	// Project dependencies
 	projectRepo := repository.NewProjectRepository(db)
@@ -216,5 +223,5 @@ func registerDependencies(db *gorm.DB) (
 	authService := services.NewAuthService(authRepo)
 	authHandler := handlers.NewAuthHandler(authService)
 
-	return projectHandler, experienceHandler, careerCertificationHandler, authHandler, authService
+	return projectHandler, experienceHandler, experienceClientHandler, careerCertificationHandler, authHandler, authService
 }
