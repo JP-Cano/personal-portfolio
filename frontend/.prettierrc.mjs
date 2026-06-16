@@ -1,7 +1,12 @@
 /** @type {import("prettier").Config} */
 export default {
-  // Astro plugin for formatting .astro files
-  plugins: ["prettier-plugin-astro"],
+  // Formatting plugins. prettier-plugin-tailwindcss must stay last so it can
+  // sort class lists after the other plugins have parsed each file type.
+  plugins: [
+    "prettier-plugin-astro",
+    "prettier-plugin-svelte",
+    "prettier-plugin-tailwindcss",
+  ],
 
   // General formatting rules
   semi: true,
@@ -14,12 +19,18 @@ export default {
   arrowParens: "always",
   endOfLine: "lf",
 
-  // Astro-specific overrides
+  // Per-language overrides
   overrides: [
     {
       files: "*.astro",
       options: {
         parser: "astro",
+      },
+    },
+    {
+      files: "*.svelte",
+      options: {
+        parser: "svelte",
       },
     },
   ],

@@ -10,16 +10,14 @@ import Projects from "@features/Projects.astro";
 import Skills from "@features/Skills.astro";
 import Footer from "@/components/Footer.astro";
 import Navigation from "@/components/Navigation.astro";
-import ScrollProgress from "@/components/ScrollProgress.astro";
-import ThreeBackground from "@/components/ThreeBackground.astro";
+import ScrollProgress from "@/components/ScrollProgress.svelte";
 import Layout from "@/layouts/Layout.astro";
 ---
 
-<Layout title="Juan Pablo Cano - Software Developer">
-  <ScrollProgress />
-  <ThreeBackground />
+<Layout title="Juan Pablo Cano - Software Engineer">
+  <ScrollProgress client:load />
   <Navigation />
-  <main>
+  <main class="relative z-10">
     <Hero />
     <About />
     <Experience />
@@ -45,30 +43,10 @@ import Layout from "@/layouts/Layout.astro";
     });
   }, observerOptions);
 
-  document.addEventListener("DOMContentLoaded", () => {
-    const fadeElements = document.querySelectorAll(".fade-in");
-    fadeElements.forEach((el) => observer.observe(el));
-  });
+  function observeFadeEls() {
+    document.querySelectorAll(".fade-in").forEach((el) => observer.observe(el));
+  }
 
-  window.addEventListener("load", () => {
-    document.body.style.opacity = "1";
-  });
+  document.addEventListener("DOMContentLoaded", observeFadeEls);
+  document.addEventListener("astro:after-swap", observeFadeEls);
 </script>
-
-<style>
-  :global(body) {
-    opacity: 0;
-    transition: opacity 0.5s ease;
-  }
-
-  main {
-    position: relative;
-    z-index: 1;
-  }
-
-  @media (width <= 768px) {
-    main {
-      padding-top: 0;
-    }
-  }
-</style>

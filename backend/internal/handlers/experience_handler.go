@@ -14,12 +14,13 @@ import (
 
 // ExperienceHandler handles HTTP requests for experiences
 type ExperienceHandler struct {
-	service services.ExperienceService
+	service       services.ExperienceService
+	clientService services.ExperienceClientService
 }
 
 // NewExperienceHandler creates a new instance of ExperienceHandler
-func NewExperienceHandler(service services.ExperienceService) *ExperienceHandler {
-	return &ExperienceHandler{service: service}
+func NewExperienceHandler(service services.ExperienceService, clientService services.ExperienceClientService) *ExperienceHandler {
+	return &ExperienceHandler{service: service, clientService: clientService}
 }
 
 // GetAllExperiences godoc
@@ -71,7 +72,13 @@ func (h *ExperienceHandler) GetExperienceByID(c *gin.Context) {
 		return
 	}
 
-	response := dto.ToExperienceResponse(experience)
+	clients, err := h.clientService.GetClientsByExperienceID(uint(id))
+	if err != nil {
+		utils.RespondWithError(c, http.StatusInternalServerError, "Failed to retrieve clients", err)
+		return
+	}
+
+	response := dto.ToExperienceDetailResponse(experience, clients)
 	utils.RespondWithSuccess(c, http.StatusOK, response, "")
 }
 

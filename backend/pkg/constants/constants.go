@@ -6,8 +6,9 @@ import (
 )
 
 var (
-	ErrExperienceNotFound = errors.New("experience not found")
-	ErrProjectNotFound    = errors.New("project not found")
+	ErrExperienceNotFound       = errors.New("experience not found")
+	ErrProjectNotFound          = errors.New("project not found")
+	ErrExperienceClientNotFound = errors.New("experience client not found")
 )
 
 const CareerCertificationsDir = "pkg/assets/career-certifications"

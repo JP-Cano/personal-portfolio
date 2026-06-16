@@ -1,0 +1,76 @@
+---
+export const prerender = false;
+
+import { api } from "@/api/api-client";
+import ExperienceClientsEditor from "@/components/admin/ExperienceClientsEditor.svelte";
+import AdminLayout from "@/layouts/AdminLayout.astro";
+import type { ExperienceDetail } from "@/types/types";
+import { API_PATHS } from "@/utils/constants";
+
+const user = Astro.locals.user;
+const { id } = Astro.params;
+
+let experience: ExperienceDetail | null = null;
+let error: string | null = null;
+
+try {
+  experience = await api.get<ExperienceDetail>(
+    `${API_PATHS.EXPERIENCES}/${id}`
+  );
+} catch (err) {
+  error = err instanceof Error ? err.message : "Failed to load experience";
+}
+
+const toInputDate = (value?: Date | string): string => {
+  if (!value) return "";
+  const date = new Date(value);
+  return isNaN(date.getTime()) ? "" : date.toISOString().split("T")[0];
+};
+
+const clients = (experience?.clients ?? []).map((c) => ({
+  id: c.id,
+  name: c.name ?? "",
+  url: c.url ?? "",
+  startDate: toInputDate(c.startDate),
+  endDate: toInputDate(c.endDate),
+  description: c.description ?? "",
+  achievements: c.achievements ?? [],
+  responsibilities: c.responsibilities ?? [],
+  technologies: c.technologies ?? [],
+}));
+
+const title = experience
+  ? `Clients · ${experience.title}`
+  : "Experience Clients";
+---
+
+<AdminLayout title={title} currentPath="/admin/experiences" user={user}>
+  {error && <div class="admin-alert admin-alert-error">{error}</div>}
+
+  <div style="margin-bottom: 1.5rem;">
+    <a href="/admin/experiences" class="admin-btn admin-btn-ghost admin-btn-sm">
+      ← Back to experiences
+    </a>
+  </div>
+
+  {
+    experience && (
+      <div class="admin-card" style="margin-bottom: 1.5rem;">
+        <h2 class="admin-card-title">{experience.title}</h2>
+        <p style="color: var(--admin-text-muted); margin: 0.5rem 0 0; font-family: var(--font-mono), monospace; font-size: 0.8125rem; letter-spacing: 0.02em;">
+          {experience.company}
+        </p>
+      </div>
+    )
+  }
+
+  {
+    experience && (
+      <ExperienceClientsEditor
+        client:load
+        experienceId={id}
+        clients={clients}
+      />
+    )
+  }
+</AdminLayout>

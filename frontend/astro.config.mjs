@@ -1,5 +1,7 @@
 // @ts-check
 import node from "@astrojs/node";
+import svelte from "@astrojs/svelte";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, envField } from "astro/config";
 
 const DEFAULT_PORT = 4321;
@@ -15,9 +17,12 @@ export default defineConfig({
 
   vite: {
     assetsInclude: ["**/*.docx"],
+
     server: {
       allowedHosts: true,
     },
+
+    plugins: [tailwindcss()],
   },
 
   env: {
@@ -43,4 +48,6 @@ export default defineConfig({
   adapter: node({
     mode: "standalone",
   }),
+
+  integrations: [svelte()],
 });

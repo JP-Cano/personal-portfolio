@@ -1,4 +1,5 @@
 ---
+import Logo from "@/icons/Logo.astro";
 import type { User } from "@/types/auth";
 import "@/styles/admin.css";
 
@@ -40,10 +41,15 @@ const getInitial = (email?: string) => {
     />
     <meta name="robots" content="noindex, nofollow" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -52,22 +58,8 @@ const getInitial = (email?: string) => {
       <aside class="admin-sidebar">
         <div class="admin-sidebar-header">
           <a href="/admin" class="admin-sidebar-logo">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-              <path d="M2 17l10 5 10-5"></path>
-              <path d="M2 12l10 5 10-5"></path>
-            </svg>
-            <span>Portfolio Admin</span>
+            <Logo />
+            <span>Admin</span>
           </a>
         </div>
 

@@ -3,7 +3,7 @@ export const prerender = false;
 
 import { api } from "@/api/api-client.ts";
 import ApiError from "@/components/ApiError.astro";
-import ProjectModal from "@/components/ProjectModal.astro";
+import ProjectModal from "@/components/ProjectModal.svelte";
 import Section from "@/components/Section.astro";
 import type { Projects } from "@/types/types.ts";
 import { API_PATHS } from "@/utils/constants.ts";
@@ -24,10 +24,12 @@ const parseTechnologies = (techString: string | undefined): string[] => {
 };
 ---
 
-<Section title="Projects" id="projects">
+<Section title="Projects" id="projects" index={4}>
   <ApiError hasError={hasError} error={error} data={projects} />
 
-  <ul class="projects-grid">
+  <ul
+    class="grid w-full max-w-full list-none grid-cols-[repeat(auto-fit,minmax(min(320px,100%),1fr))] items-stretch gap-6 p-0"
+  >
     {
       !hasError &&
         projects &&
@@ -45,25 +47,26 @@ const parseTechnologies = (techString: string | undefined): string[] => {
               technologies: technologies || "",
             });
             return (
-              <li class="project-item">
+              <li class="flex max-w-full min-w-0">
                 <article
-                  class="project-card"
+                  class="card card-hover group relative flex w-full max-w-full cursor-pointer flex-col overflow-hidden p-7"
                   data-project-card
                   data-project={projectData}
                   role="button"
                   tabindex="0"
                 >
-                  <div class="card-background" />
-                  <header class="project-header">
-                    <div class="project-title-row">
-                      <h3 class="project-title">{name}</h3>
+                  <header class="z-[1] min-w-0 flex-1">
+                    <div class="mb-4 flex flex-wrap items-center gap-3">
+                      <h3 class="group-hover:text-primary m-0 min-w-0 flex-1 truncate text-[1.25rem] transition-colors">
+                        {name}
+                      </h3>
                       {isActive ? (
-                        <span class="status-badge active">
-                          <span class="status-dot" />
-                          Active
+                        <span class="chip text-primary shrink-0 lowercase">
+                          <span class="h-1.5 w-1.5 animate-[pulse-dot_1.6s_ease-in-out_infinite] rounded-full bg-current" />
+                          active
                         </span>
                       ) : (
-                        <span class="status-badge completed">
+                        <span class="chip text-secondary shrink-0 lowercase">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="12"
@@ -74,20 +77,23 @@ const parseTechnologies = (techString: string | undefined): string[] => {
                             stroke-width="3"
                             stroke-linecap="round"
                             stroke-linejoin="round"
+                            class="shrink-0"
                           >
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
-                          Completed
+                          completed
                         </span>
                       )}
                     </div>
-                    <p class="project-description">{description}</p>
+                    <p class="text-text-light m-0 line-clamp-3 text-[0.96rem] leading-[1.65]">
+                      {description}
+                    </p>
                   </header>
-                  <footer class="project-footer">
+                  <footer class="z-[1] mt-auto flex flex-col gap-4 pt-6">
                     {techArray.length > 0 && (
-                      <div class="highlights">
+                      <div class="flex flex-wrap gap-2">
                         {techArray.map((tech) => {
-                          return <span class="highlight-tag">{tech}</span>;
+                          return <span class="chip">{tech}</span>;
                         })}
                       </div>
                     )}
@@ -101,268 +107,7 @@ const parseTechnologies = (techString: string | undefined): string[] => {
   </ul>
 </Section>
 
-<ProjectModal />
-
-<style>
-  .projects-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
-    gap: 2rem;
-    padding: 0;
-    list-style: none;
-    align-items: stretch;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .project-item {
-    display: flex;
-    min-width: 0;
-    max-width: 100%;
-  }
-
-  .project-card {
-    position: relative;
-    width: 100%;
-    max-width: 100%;
-    display: flex;
-    flex-direction: column;
-    background: var(--color-surface);
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    border: 1px solid var(--color-border);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    overflow: hidden;
-    box-sizing: border-box;
-    cursor: pointer;
-  }
-
-  .project-card:focus {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
-  }
-
-  .project-card:focus:not(:focus-visible) {
-    outline: none;
-  }
-
-  .card-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      135deg,
-      rgba(99, 102, 241, 0.05) 0%,
-      rgba(139, 92, 246, 0.05) 100%
-    );
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-  }
-
-  .project-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 40px rgba(99, 102, 241, 0.2);
-    border-color: var(--color-primary);
-  }
-
-  .project-card:hover .card-background {
-    opacity: 1;
-  }
-
-  .project-header {
-    flex: 1;
-    z-index: 1;
-    min-width: 0;
-  }
-
-  .project-title-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .project-title {
-    font-size: 1.5rem;
-    margin: 0;
-    flex: 1;
-    min-width: 0;
-    color: var(--color-text);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    word-break: break-word;
-    transition: color 0.3s ease;
-  }
-
-  .project-card:hover .project-title {
-    color: var(--color-primary);
-  }
-
-  .status-badge {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    flex-shrink: 0;
-    white-space: nowrap;
-  }
-
-  .status-badge.active {
-    background: rgba(34, 197, 94, 0.15);
-    color: #22c55e;
-    border: 1px solid rgba(34, 197, 94, 0.3);
-  }
-
-  .status-badge.completed {
-    background: rgba(99, 102, 241, 0.1);
-    color: #818cf8;
-    border: 1px solid rgba(99, 102, 241, 0.2);
-  }
-
-  .status-badge.completed svg {
-    flex-shrink: 0;
-  }
-
-  .status-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%,
-    100% {
-      opacity: 1;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.5;
-      transform: scale(0.8);
-    }
-  }
-
-  .project-description {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: var(--color-text);
-    margin: 0;
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    word-break: break-word;
-    overflow-wrap: break-word;
-  }
-
-  .project-footer {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    margin-top: auto;
-    padding-top: 1.5rem;
-    z-index: 1;
-  }
-
-  .highlights {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .highlight-tag {
-    padding: 0.4rem 0.8rem;
-    background: var(--color-bg-alt);
-    color: var(--color-text);
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    word-break: break-word;
-    overflow-wrap: break-word;
-  }
-
-  .project-card:hover .highlight-tag {
-    background: rgba(99, 102, 241, 0.1);
-    color: var(--color-primary);
-  }
-
-  @media (width <= 768px) {
-    .projects-grid {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-
-    .project-card {
-      padding: 1.5rem;
-    }
-
-    .project-title {
-      font-size: 1.25rem;
-    }
-
-    .project-title-row {
-      gap: 0.5rem;
-    }
-
-    .project-description {
-      font-size: 0.95rem;
-    }
-
-    .status-badge {
-      padding: 0.3rem 0.6rem;
-      font-size: 0.65rem;
-    }
-  }
-
-  @media (width <= 400px) {
-    .project-card {
-      padding: 1.25rem;
-    }
-
-    .project-title {
-      font-size: 1.1rem;
-    }
-
-    .project-title-row {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.5rem;
-    }
-
-    .status-badge {
-      align-self: flex-start;
-    }
-
-    .highlight-tag {
-      padding: 0.3rem 0.6rem;
-      font-size: 0.8rem;
-    }
-  }
-
-  @media print {
-    .status-dot {
-      animation: none;
-    }
-
-    .project-card {
-      break-inside: avoid;
-    }
-  }
-</style>
+<ProjectModal client:idle />
 
 <script>
   function initProjectCards() {
@@ -377,13 +122,14 @@ const parseTechnologies = (techString: string | undefined): string[] => {
 
       const handleOpen = () => {
         const projectData = cardEl.dataset.project;
-        if (projectData && (window as any).openProjectModal) {
-          try {
-            const data = JSON.parse(projectData);
-            (window as any).openProjectModal(data);
-          } catch (e) {
-            console.error("Failed to parse project data:", e);
-          }
+        if (!projectData) return;
+        try {
+          const data = JSON.parse(projectData);
+          window.dispatchEvent(
+            new CustomEvent("project:open", { detail: data })
+          );
+        } catch (e) {
+          console.error("Failed to parse project data:", e);
         }
       };
 

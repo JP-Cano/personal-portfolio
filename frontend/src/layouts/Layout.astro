@@ -1,6 +1,7 @@
 ---
 import { ClientRouter } from "astro:transitions";
 import ThemeProvider from "@/components/ThemeProvider.astro";
+import "@/styles/global.css";
 
 interface Props {
   title: string;
@@ -22,12 +23,17 @@ const { title } = Astro.props;
     />
     <meta
       name="description"
-      content="Personal portfolio of Juan Pablo Cano - Software Developer"
+      content="Personal portfolio of Juan Pablo Cano - Software Engineer"
     />
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+      href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400..700&display=swap"
       rel="stylesheet"
     />
   </head>
@@ -37,182 +43,84 @@ const { title } = Astro.props;
 </html>
 
 <style is:global>
+  /*
+   * Design tokens for "Luminous Depth". Light is :root (default); dark is the
+   * hero and overrides under :root[data-theme="dark"]. Components must read
+   * these via var(--token) (or Tailwind utilities bridged in global.css);
+   * never hardcode hex except translucent shadows/scrims.
+   */
   :root {
+    /* Indigo -> violet -> blue gradient stops (the v1 palette). */
+    --grad-1: #6366f1; /* indigo */
+    --grad-2: #8b5cf6; /* violet */
+    --grad-3: #3b82f6; /* blue   */
+
     --color-primary: #6366f1;
     --color-primary-dark: #4f46e5;
     --color-secondary: #8b5cf6;
     --color-accent: #3b82f6;
+
     --color-text: #1f2937;
     --color-text-light: #6b7280;
     --color-bg: #ffffff;
     --color-bg-alt: #f9fafb;
-    --color-border: #e5e7eb;
     --color-surface: #ffffff;
+    --color-surface-2: #f3f4f6;
+    --color-border: #e5e7eb;
+    --color-border-strong: #d1d5db;
     --color-icon: #1f2937;
-    --nav-surface: rgba(255, 255, 255, 0.9);
+
+    --nav-surface: rgba(255, 255, 255, 0.85);
+
     --footer-grad-start: #1e1b4b;
     --footer-grad-end: #312e81;
     --footer-text: #ffffff;
     --footer-subtle: #a5b4fc;
     --footer-heading-grad-start: #ffffff;
     --footer-heading-grad-end: #c7d2fe;
+
+    /* v1 typography: Inter body + Space Grotesk headings; logo keeps Clash. */
     --font-sans:
       "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
       sans-serif;
     --font-display: "Space Grotesk", system-ui, sans-serif;
+    --font-logo: "Clash Display", "Space Grotesk", system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+    --radius: 14px;
+    --radius-sm: 8px;
+    --radius-lg: 20px;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   :root[data-theme="dark"] {
+    /* Softer indigo/violet/blue against the deep navy base. */
+    --grad-1: #818cf8; /* indigo */
+    --grad-2: #a78bfa; /* violet */
+    --grad-3: #60a5fa; /* blue   */
+
     --color-primary: #818cf8;
     --color-primary-dark: #6366f1;
     --color-secondary: #a78bfa;
     --color-accent: #60a5fa;
+
     --color-text: #e5e7eb;
     --color-text-light: #9ca3af;
     --color-bg: #0b1020;
     --color-bg-alt: #0f172a;
-    --color-border: #1f2937;
     --color-surface: #111827;
-    --color-icon: #f97316;
-    --nav-surface: rgba(17, 24, 39, 0.9);
+    --color-surface-2: #1f2937;
+    --color-border: #1f2937;
+    --color-border-strong: #374151;
+    --color-icon: #e5e7eb;
+
+    --nav-surface: rgba(17, 24, 39, 0.85);
+
     --footer-grad-start: #0b1020;
     --footer-grad-end: #151a2f;
     --footer-text: #e5e7eb;
     --footer-subtle: #9ca3af;
     --footer-heading-grad-start: #e5e7eb;
     --footer-heading-grad-end: #a5b4fc;
-  }
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  html {
-    scroll-behavior: smooth;
-    font-family: var(--font-sans), sans-serif;
-    background: var(--color-bg);
-    color: var(--color-text);
-    letter-spacing: -0.01rem;
-    overflow-x: hidden;
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    max-width: 100vw;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--font-display), sans-serif;
-    font-weight: 700;
-    line-height: 1.2;
-    color: var(--color-text);
-  }
-
-  h1 {
-    font-size: clamp(2.5rem, 5vw, 4rem);
-    letter-spacing: -0.02em;
-  }
-
-  h2 {
-    font-size: clamp(2rem, 4vw, 3rem);
-    letter-spacing: -0.02em;
-  }
-
-  h3 {
-    font-size: clamp(1.5rem, 3vw, 2rem);
-  }
-
-  p {
-    color: var(--color-text-light);
-    font-size: 1rem;
-    line-height: 1.7;
-    text-wrap: pretty;
-  }
-
-  a {
-    text-decoration: none;
-    color: inherit;
-    transition: var(--transition);
-  }
-
-  ul {
-    list-style: none;
-  }
-
-  button {
-    font-family: inherit;
-    cursor: pointer;
-    border: none;
-    transition: var(--transition);
-  }
-
-  /* Scroll animations */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(30px);
-    transition:
-      opacity 0.6s ease,
-      transform 0.6s ease;
-  }
-
-  .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* Selection styling */
-  ::selection {
-    background: var(--color-primary);
-    color: white;
-  }
-
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    width: 10px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: var(--color-bg-alt);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-primary);
-    border-radius: 5px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primary-dark);
-  }
-
-  .print {
-    display: none !important;
-  }
-
-  @media print {
-    .no-print {
-      display: none !important;
-    }
-
-    .print {
-      display: block !important;
-    }
-
-    astro-dev-toolbar {
-      display: none !important;
-    }
-
-    article {
-      break-inside: avoid;
-    }
   }
 </style>

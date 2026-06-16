@@ -9,17 +9,18 @@ import (
 
 // ExperienceResponse represents the API response for an experience
 type ExperienceResponse struct {
-	ID          uint       `json:"id"`
-	Title       string     `json:"title"`
-	Company     string     `json:"company"`
-	URL         *string    `json:"url,omitempty"`
-	Location    string     `json:"location"`
-	Type        string     `json:"type"`
-	StartDate   time.Time  `json:"startDate"`
-	EndDate     *time.Time `json:"endDate,omitempty"`
-	Description string     `json:"description"`
-	CreatedAt   time.Time  `json:"createdAt"`
-	UpdatedAt   time.Time  `json:"updatedAt"`
+	ID          uint                       `json:"id"`
+	Title       string                     `json:"title"`
+	Company     string                     `json:"company"`
+	URL         *string                    `json:"url,omitempty"`
+	Location    string                     `json:"location"`
+	Type        string                     `json:"type"`
+	StartDate   time.Time                  `json:"startDate"`
+	EndDate     *time.Time                 `json:"endDate,omitempty"`
+	Description string                     `json:"description"`
+	CreatedAt   time.Time                  `json:"createdAt"`
+	UpdatedAt   time.Time                  `json:"updatedAt"`
+	Clients     []ExperienceClientResponse `json:"clients"`
 }
 
 // ExperienceRequest represents the API request for creating an experience
@@ -75,6 +76,12 @@ func ToExperienceResponseList(experiences []models.Experience) []ExperienceRespo
 		responses[i] = ToExperienceResponse(&exp)
 	}
 	return responses
+}
+
+func ToExperienceDetailResponse(experience *models.Experience, clients []models.ExperienceClient) ExperienceResponse {
+	resp := ToExperienceResponse(experience)
+	resp.Clients = ToExperienceClientResponseList(clients)
+	return resp
 }
 
 // ToExperience converts ExperienceRequest to models.Experience

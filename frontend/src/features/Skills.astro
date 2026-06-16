@@ -114,34 +114,34 @@ const skillCategories = [
 ];
 ---
 
-<Section title="Skills" id="skills">
-  <div class="skills-container">
+<Section title="Skills" id="skills" index={5}>
+  <div
+    class="grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-6 max-[768px]:grid-cols-1 max-[768px]:gap-5"
+  >
     {
-      skillCategories.map((category, categoryIndex) => (
-        <div
-          class="skill-category"
-          style={`animation-delay: ${categoryIndex * 0.1}s`}
-        >
-          <h3 class="category-title">{category.title}</h3>
-          <ul class="skills-list">
-            {category.skills.map(({ name }, index) => {
+      skillCategories.map((category) => (
+        <div class="card p-6">
+          <div class="border-border mb-5 flex items-baseline justify-between gap-3 border-b pb-3.5">
+            <span class="eyebrow">{category.title}</span>
+            <span class="text-text-light font-mono text-[0.78rem]">
+              {category.skills.length}
+            </span>
+          </div>
+          <ul class="m-0 flex list-none flex-wrap gap-2.5 p-0">
+            {category.skills.map(({ name }) => {
               const iconName = name === "Next.js" ? "Next" : name;
               const Icon = SKILLS_ICONS[iconName];
 
               return (
-                <li
-                  class="skill-item"
-                  style={`animation-delay: ${categoryIndex * 0.1 + index * 0.05}s`}
-                >
-                  <div class="skill-content">
-                    {Icon && (
-                      <div class="skill-icon">
-                        <Icon />
-                      </div>
-                    )}
-                    <span class="skill-name">{name}</span>
-                  </div>
-                  <div class="skill-glow" />
+                <li class="group border-border bg-bg-alt hover:border-primary inline-flex items-center gap-2 rounded-sm border px-3 py-2 transition-[border-color,transform] duration-200 hover:-translate-y-0.5">
+                  {Icon && (
+                    <div class="skill-icon flex h-[22px] w-[22px] shrink-0 items-center justify-center [&_svg]:h-full [&_svg]:w-full">
+                      <Icon />
+                    </div>
+                  )}
+                  <span class="text-text-light group-hover:text-text font-mono text-[0.8rem] font-medium transition-colors duration-200">
+                    {name}
+                  </span>
                 </li>
               );
             })}
@@ -153,86 +153,9 @@ const skillCategories = [
 </Section>
 
 <style>
-  .skills-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-    gap: 2.5rem;
-  }
-
-  .skill-category {
-    animation: fadeInUp 0.6s ease backwards;
-  }
-
-  .category-title {
-    font-size: 1.25rem;
-    color: var(--color-text);
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid var(--color-border);
-    position: relative;
-  }
-
-  .category-title::after {
-    content: "";
-    position: absolute;
-    bottom: -2px;
-    left: 0;
-    width: 50px;
-    height: 2px;
-    background: linear-gradient(
-      135deg,
-      var(--color-primary) 0%,
-      var(--color-secondary) 100%
-    );
-  }
-
-  .skills-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
-
-  .skill-item {
-    position: relative;
-    animation: slideInRight 0.5s ease backwards;
-  }
-
-  .skill-content {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 0.875rem 1.25rem;
-    background: var(--color-surface);
-    border: 2px solid var(--color-border);
-    border-radius: 12px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    z-index: 1;
-  }
-
-  .skill-item:hover .skill-content {
-    transform: translateX(8px);
-    border-color: var(--color-primary);
-    box-shadow: 0 4px 20px rgba(99, 102, 241, 0.2);
-    background: linear-gradient(
-      135deg,
-      rgba(99, 102, 241, 0.05) 0%,
-      rgba(139, 92, 246, 0.05) 100%
-    );
-  }
-
-  .skill-icon {
-    width: 28px;
-    height: 28px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.3s ease;
-  }
-
+  /* Narrow exception: recolor inline skill SVGs to the icon token. Tailwind
+     can't target descendant SVG fills/strokes, and we must preserve outline
+     (svg[fill="none"]) icons. No layout/color of the component lives here. */
   .skill-icon :global(svg) {
     color: var(--color-icon);
     transition:
@@ -254,79 +177,5 @@ const skillCategories = [
   .skill-icon :global(svg[fill="none"] circle),
   .skill-icon :global(svg[fill="none"] rect) {
     fill: none;
-  }
-
-  .skill-item:hover .skill-icon {
-    transform: scale(1.2) rotate(5deg);
-  }
-
-  .skill-name {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-text);
-    transition: color 0.3s ease;
-  }
-
-  .skill-item:hover .skill-name {
-    color: var(--color-primary);
-  }
-
-  .skill-glow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(
-      135deg,
-      var(--color-primary) 0%,
-      var(--color-secondary) 100%
-    );
-    border-radius: 12px;
-    opacity: 0;
-    filter: blur(15px);
-    transition: opacity 0.3s ease;
-    z-index: 0;
-  }
-
-  .skill-item:hover .skill-glow {
-    opacity: 0.3;
-  }
-
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes slideInRight {
-    from {
-      opacity: 0;
-      transform: translateX(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
-  }
-
-  @media (width <= 768px) {
-    .skills-container {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-
-    .skill-content {
-      padding: 0.75rem 1rem;
-    }
-
-    .skill-name {
-      font-size: 0.95rem;
-    }
   }
 </style>
