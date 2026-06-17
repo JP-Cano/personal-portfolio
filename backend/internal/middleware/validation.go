@@ -95,12 +95,6 @@ func validateAfterStartDateString(fl validator.FieldLevel) bool {
 		return true
 	}
 
-	// Parse end date
-	endDate, err := utils.ParseDate(endDateStr)
-	if err != nil {
-		return false
-	}
-
 	// Get parent struct to access StartDate
 	parent := fl.Parent()
 	startDateField := parent.FieldByName("StartDate")
@@ -108,12 +102,22 @@ func validateAfterStartDateString(fl validator.FieldLevel) bool {
 		return false
 	}
 
+	// If StartDate is nil (not provided in PATCH request), skip validation
+	if startDateField.IsNil() {
+		return true
+	}
+
 	startDateStr := startDateField.String()
 	if startDateStr == "" {
+		return true // StartDate not provided, skip validation
+	}
+
+	// Parse dates
+	endDate, err := utils.ParseDate(endDateStr)
+	if err != nil {
 		return false
 	}
 
-	// Parse start date
 	startDate, err := utils.ParseDate(startDateStr)
 	if err != nil {
 		return false
