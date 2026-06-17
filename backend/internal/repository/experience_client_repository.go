@@ -25,7 +25,7 @@ func NewExperienceClientRepository(db *gorm.DB) ExperienceClientRepository {
 func (r *experienceClientRepository) FindByExperienceID(experienceID uint) ([]models.ExperienceClient, error) {
 	var clients []models.ExperienceClient
 	result := r.db.Where("experience_id = ? AND deleted_at IS NULL", experienceID).
-		Order("start_date ASC").
+		Order("end_date IS NULL DESC, end_date DESC").
 		Find(&clients)
 	if result.Error != nil {
 		return nil, result.Error

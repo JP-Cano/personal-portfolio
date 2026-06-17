@@ -32,9 +32,7 @@ if (!hasError) {
   }
 }
 
-const clients = [...(experience?.clients ?? [])].sort(
-  (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
-);
+const clients = experience?.clients ?? [];
 
 const formatMonthYear = (date?: Date): string =>
   date
