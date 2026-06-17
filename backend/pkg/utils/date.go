@@ -25,6 +25,8 @@ func ParseDate(dateStr string) (time.Time, error) {
 		"2-1-06",     // D-M-YY
 		"2006-01-02", // YYYY-MM-DD (ISO format)
 		"2006/01/02", // YYYY/MM/DD
+		"2006-01",    // YYYY-MM (month only)
+		"01/2006",    // MM/YYYY (month only)
 	}
 
 	for _, format := range formats {
@@ -33,7 +35,7 @@ func ParseDate(dateStr string) (time.Time, error) {
 		}
 	}
 
-	return time.Time{}, fmt.Errorf("unable to parse date '%s'. Supported formats: DD/MM/YYYY, DD/MM/YY, DD-MM-YYYY, DD-MM-YY, YYYY-MM-DD", dateStr)
+	return time.Time{}, fmt.Errorf("unable to parse date '%s'. Supported formats: MM/YYYY, YYYY-MM, DD/MM/YYYY, YYYY-MM-DD", dateStr)
 }
 
 // ParseDateToPtr parses a date string and returns a pointer to time.Time

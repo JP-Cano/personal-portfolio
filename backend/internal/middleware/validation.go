@@ -215,7 +215,7 @@ func formatValidationErrors(errors validator.ValidationErrors) []string {
 		case "after_start_date_str":
 			message = fmt.Sprintf("%s must be after start date", field)
 		case "date_format":
-			message = fmt.Sprintf("%s must be a valid date (formats: DD/MM/YYYY, DD/MM/YY, DD-MM-YYYY, DD-MM-YY, YYYY-MM-DD)", field)
+			message = fmt.Sprintf("%s must be a valid date (formats: MM/YYYY, YYYY-MM, DD/MM/YYYY, YYYY-MM-DD)", field)
 		default:
 			message = fmt.Sprintf("%s is invalid", field)
 		}

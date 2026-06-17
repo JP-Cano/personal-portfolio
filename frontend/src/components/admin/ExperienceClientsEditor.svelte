@@ -59,8 +59,9 @@
 
   function toInputDate(value?: string): string {
     if (!value) return "";
-    const date = new Date(value);
-    return isNaN(date.getTime()) ? "" : date.toISOString().split("T")[0];
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return "";
+    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
   }
 
   function normalize(raw: RawClient): ClientView {
@@ -265,7 +266,7 @@
           </label>
           <input
             id="client-start"
-            type="date"
+            type="month"
             class="admin-input"
             bind:value={form.startDate}
             required
@@ -275,7 +276,7 @@
           <label class="admin-label" for="client-end">End date</label>
           <input
             id="client-end"
-            type="date"
+            type="month"
             class="admin-input"
             bind:value={form.endDate}
           />
