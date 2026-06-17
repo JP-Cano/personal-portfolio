@@ -99,12 +99,15 @@ func validateAfterStartDateString(fl validator.FieldLevel) bool {
 	parent := fl.Parent()
 	startDateField := parent.FieldByName("StartDate")
 	if !startDateField.IsValid() {
-		return false
+		return true // Field not found, skip validation
 	}
 
-	// If StartDate is nil (not provided in PATCH request), skip validation
-	if startDateField.IsNil() {
-		return true
+	// If StartDate is a pointer, check if it's nil and dereference
+	if startDateField.Kind() == reflect.Ptr {
+		if startDateField.IsNil() {
+			return true // StartDate not provided, skip validation
+		}
+		startDateField = startDateField.Elem()
 	}
 
 	startDateStr := startDateField.String()
