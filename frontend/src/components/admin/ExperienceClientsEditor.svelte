@@ -59,9 +59,14 @@
 
   function toInputDate(value?: string): string {
     if (!value) return "";
-    const d = new Date(value);
+    // Parse as local date to avoid timezone issues
+    const parts = value.split("-");
+    if (parts.length === 2) {
+      return `${parts[0]}-${parts[1]}`;
+    }
+    const d = new Date(value + "T00:00:00");
     if (isNaN(d.getTime())) return "";
-    return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
   }
 
   function normalize(raw: RawClient): ClientView {
@@ -112,13 +117,15 @@
   }
 
   function formatPeriod(client: ClientView): string {
-    const fmt = (d: string) =>
-      d
-        ? new Date(d).toLocaleDateString("en-US", {
-            month: "short",
-            year: "numeric",
-          })
-        : "Present";
+    const fmt = (d: string) => {
+      if (!d) return "Present";
+      const [year, month] = d.split("-").map(Number);
+      const date = new Date(year, month - 1);
+      return date.toLocaleDateString("en-US", {
+        month: "short",
+        year: "numeric",
+      });
+    };
     return `${fmt(client.startDate)} - ${fmt(client.endDate)}`;
   }
 
