@@ -10,6 +10,10 @@ const DEFAULT_PORT = 4321;
 export default defineConfig({
   output: "server",
 
+  security: {
+    checkOrigin: false,
+  },
+
   server: {
     host: true,
     allowedHosts: true,
@@ -47,7 +51,6 @@ export default defineConfig({
 
   adapter: node({
     mode: "standalone",
-    trustProxy: true,
   }),
 
   integrations: [svelte()],

@@ -119,7 +119,10 @@ func (h *AuthHandler) setSessionCookie(c *gin.Context, sessionID string) {
 	domain := os.Getenv("COOKIE_DOMAIN")
 	sameSite := http.SameSiteLaxMode
 
-	if os.Getenv("COOKIE_SAME_SITE") == "none" {
+	switch os.Getenv("COOKIE_SAME_SITE") {
+	case "strict":
+		sameSite = http.SameSiteStrictMode
+	case "none":
 		sameSite = http.SameSiteNoneMode
 	}
 
@@ -141,7 +144,10 @@ func (h *AuthHandler) clearSessionCookie(c *gin.Context) {
 	domain := os.Getenv("COOKIE_DOMAIN")
 	sameSite := http.SameSiteLaxMode
 
-	if os.Getenv("COOKIE_SAME_SITE") == "none" {
+	switch os.Getenv("COOKIE_SAME_SITE") {
+	case "strict":
+		sameSite = http.SameSiteStrictMode
+	case "none":
 		sameSite = http.SameSiteNoneMode
 	}
 
