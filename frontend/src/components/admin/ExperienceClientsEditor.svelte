@@ -153,10 +153,25 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save client");
 
-      const saved = normalize(data.data as RawClient);
       if (editingId) {
-        clients = clients.map((c) => (c.id === editingId ? saved : c));
+        // PATCH returns null data, update locally with form values
+        clients = clients.map((c) =>
+          c.id === editingId
+            ? {
+                ...c,
+                name: form.name,
+                url: form.url,
+                startDate: form.startDate,
+                endDate: form.endDate,
+                description: form.description,
+                achievements: form.achievements,
+                responsibilities: form.responsibilities,
+                technologies: form.technologies,
+              }
+            : c
+        );
       } else {
+        const saved = normalize(data.data as RawClient);
         clients = [...clients, saved];
       }
       closeForm();
