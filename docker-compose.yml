@@ -70,7 +70,7 @@ services:
     restart: unless-stopped
     environment:
       - SITE_ADDRESS=${SITE_ADDRESS:-:80}
-      - SSL_EMAIL=${SSL_EMAIL:-}
+      - SSL_EMAIL=${SSL_EMAIL:-your-email@example.com}
     ports:
       - "80:80"
       - "443:443"
