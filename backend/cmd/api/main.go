@@ -105,7 +105,10 @@ func main() {
 	r.Static("/certifications", constants.CareerCertificationsDir)
 	logger.Info("Serving static files from: %s", constants.CareerCertificationsDir)
 
-	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	enableSwagger := os.Getenv("ENABLE_SWAGGER") == "true"
+	if enableSwagger {
+		r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	}
 
 	routes.SetupRoutes(
 		r,
@@ -123,7 +126,11 @@ func main() {
 	}
 
 	logger.Info("Starting server on port: %s", port)
-	logger.Info("Swagger documentation available at: http://localhost:%s/swagger/index.html", port)
+	if enableSwagger {
+		logger.Info("Swagger documentation available at: http://localhost:%s/swagger/index.html", port)
+	} else {
+		logger.Info("Swagger documentation is disabled (set ENABLE_SWAGGER=true to enable)")
+	}
 
 	err = r.Run(":" + port)
 	if err != nil {

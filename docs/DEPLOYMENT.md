@@ -115,6 +115,7 @@ Step 6) — you only need to `scp` manually once, here.
 # Backend
 PORT=8080
 DEBUG=false
+ENABLE_SWAGGER=false
 DB_DRIVER=sqlite
 DATABASE_PATH=portfolio.db
 

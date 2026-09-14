@@ -20,10 +20,6 @@
 		reverse_proxy backend:8080
 	}
 
-	handle /swagger/* {
-		reverse_proxy backend:8080
-	}
-
 	handle /certifications/* {
 		reverse_proxy backend:8080
 	}

@@ -13,6 +13,7 @@ services:
       - TURSO_DATABASE_URL=${TURSO_DATABASE_URL}
       - TURSO_AUTH_TOKEN=${TURSO_AUTH_TOKEN}
       - DEBUG=${DEBUG:-false}
+      - ENABLE_SWAGGER=${ENABLE_SWAGGER:-false}
       - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
       - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-http://localhost}
       - SESSION_COOKIE_NAME=${SESSION_COOKIE_NAME:-portfolio_session}
