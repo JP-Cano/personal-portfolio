@@ -60,16 +60,16 @@ success "Services started!"
 info "Waiting for services to be ready..."
 sleep 10
 
-# Wait for nginx to be ready
-info "Waiting for nginx..."
+# Wait for caddy to be ready
+info "Waiting for caddy..."
 sleep 5
 
-# Check backend health through nginx
-info "Testing backend health through nginx..."
+# Check backend health through caddy
+info "Testing backend health through caddy..."
 if curl -f http://localhost/api/v1/health > /dev/null 2>&1 || curl -f http://localhost/health > /dev/null 2>&1; then
     success "Backend is accessible!"
 else
-    warning "Backend not accessible through nginx yet (this is OK for local testing)"
+    warning "Backend not accessible through caddy yet (this is OK for local testing)"
 fi
 
 # Check if services are running

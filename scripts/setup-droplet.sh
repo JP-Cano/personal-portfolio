@@ -99,7 +99,7 @@ success "Docker Compose is ready"
 # 4. Create application directory
 # ============================================
 info "Creating application directory..."
-mkdir -p /opt/portfolio/{data/backend,data/certifications,nginx/conf.d,certbot/www,certbot/conf}
+mkdir -p /opt/portfolio/{data/backend,data/certifications,data/caddy/data,data/caddy/config}
 success "Application directory created"
 
 # ============================================
@@ -171,13 +171,13 @@ info "Next steps:"
 echo "  1. Add your SSH key to /home/deployer/.ssh/authorized_keys"
 echo "  2. Copy your project files to /opt/portfolio/"
 echo "  3. Copy .env file with your configuration"
-echo "  4. Update nginx/conf.d/default.conf with your domain"
-echo "  5. Set up SSL certificate (see ssl-setup.sh)"
+echo "  4. Update Caddyfile with your domain"
+echo "  5. Caddy will automatically provision SSL certificates"
 echo "  6. Configure GitHub Actions secrets:"
 echo "     - DROPLET_HOST: your droplet IP"
 echo "     - DROPLET_USERNAME: deployer"
 echo "     - DROPLET_SSH_KEY: your private SSH key"
 echo ""
 info "To copy files from local machine, use:"
-echo "  scp -r docker-compose.yml nginx .env deployer@YOUR_DROPLET_IP:/opt/portfolio/"
+echo "  scp -r docker-compose.yml Caddyfile .env deployer@YOUR_DROPLET_IP:/opt/portfolio/"
 echo ""
