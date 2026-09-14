@@ -78,6 +78,16 @@ jobs:
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ steps.image-names.outputs.frontend }}:buildcache
           cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ steps.image-names.outputs.frontend }}:buildcache,mode=max
 
+      - name: Sync compose & Caddy config to droplet
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USERNAME }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          source: "docker-compose.yml,Caddyfile"
+          target: "/opt/portfolio"
+          strip_components: 0
+
       - name: Deploy to DigitalOcean
         uses: appleboy/ssh-action@v1.0.3
         with:
