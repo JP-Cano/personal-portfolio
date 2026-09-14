@@ -210,7 +210,7 @@ docker compose -f docker-compose.yml logs caddy
 ### Test your endpoints:
 ```bash
 # Health check
-curl http://YOUR_DROPLET_IP/health
+curl https://yourdomain.com/health
 
 # API
 curl https://yourdomain.com/api/v1/health
@@ -440,8 +440,9 @@ docker compose -f docker-compose.yml logs caddy --tail 100
 # Confirm the certificate actually being served
 echo | openssl s_client -connect yourdomain.com:443 -servername yourdomain.com 2>/dev/null | openssl x509 -noout -dates
 
-# Force Caddy to reload its config (rarely needed — Caddy watches the mounted
-# Caddyfile and reloads on its own when it changes)
+# Caddy does not watch the mounted Caddyfile for changes. CI force-recreates
+# the caddy container on every deploy so it always picks up the latest
+# Caddyfile automatically. To force a reload manually without waiting for CI:
 docker exec portfolio-caddy caddy reload --config /etc/caddy/Caddyfile
 ```
 

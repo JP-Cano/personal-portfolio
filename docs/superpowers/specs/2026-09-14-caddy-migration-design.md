@@ -107,7 +107,10 @@ El servicio `frontend` corrige su healthcheck (bug preexistente, mismo archivo):
 	email {$SSL_EMAIL}
 }
 
-{$SITE_ADDRESS:80} {
+{$SITE_ADDRESS::80} {
+	# Doble ":" a propósito: {$VAR:default} de Caddy separa en el PRIMER ":",
+	# así que {$SITE_ADDRESS:80} daría default = "80" (hostname suelto), no
+	# ":80" (binding de puerto). {$SITE_ADDRESS::80} sí da default = ":80".
 	encode gzip zstd
 
 	handle /health {
@@ -141,7 +144,7 @@ Comportamiento:
   igual que hoy. No hace ninguna llamada saliente a Let's Encrypt.
 - **Producción** (`SITE_ADDRESS=juanpablocano.com www.juanpablocano.com` en el `.env` del
   droplet): Caddy detecta que es un dominio público, obtiene el certificado automáticamente
-  en el primer request entrante, sirve HTTP→HTTPS redirect por defecto, y renueva sin
+  al cargar la configuración (no espera al primer request), sirve HTTP→HTTPS redirect por defecto, y renueva sin
   intervención — todo dentro de este mismo proceso.
 - Caddy agrega automáticamente `X-Forwarded-For`, `X-Forwarded-Proto`, `Host`, y reenvía
   cookies y upgrades de WebSocket en `reverse_proxy` sin configuración adicional (a diferencia
@@ -206,7 +209,7 @@ lista explícita de archivos (nunca un directorio completo sin filtrar):
 
 ```yaml
       - name: Sync compose & Caddy config to droplet
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v1.0.0
         with:
           host: ${{ secrets.DROPLET_HOST }}
           username: ${{ secrets.DROPLET_USERNAME }}
@@ -227,14 +230,20 @@ No tengo acceso SSH al droplet, así que este paso lo ejecuta el usuario. Docume
 
 1. En el `.env` del droplet, agregar `SITE_ADDRESS="juanpablocano.com www.juanpablocano.com"`
    (separado por espacio, no coma — así es como Caddyfile espera múltiples direcciones de
-   sitio) y confirmar que `SSL_EMAIL` sigue con el valor correcto.
+   sitio). **`SSL_EMAIL` debe tener un valor real y no puede estar vacío** — si está vacío,
+   Caddy no arranca en absoluto (falla al parsear su config), y esto pasaría justo después de
+   que el paso 3 ya tiró nginx/certbot. Confirmar con:
+   `grep '^SSL_EMAIL=' /opt/portfolio/.env` antes de continuar.
 2. Copiar el `docker-compose.yml` y `Caddyfile` nuevos al droplet (manual esta primera vez;
    los siguientes deploys ya lo hacen solos vía el paso de CI agregado).
 3. `docker compose up -d --remove-orphans` — esto detiene y remueve `nginx`/`certbot` como
    huérfanos (ya no están en el compose file) y levanta `caddy`. Downtime esperado: unos
    minutos mientras Caddy obtiene el certificado nuevo de Let's Encrypt.
 4. Verificar: `docker compose logs caddy` sin errores de ACME, `curl -I https://juanpablocano.com`
-   responde `200`, certificado con expiry ~90 días adelante.
+   responde `200`, certificado con expiry ~90 días adelante. (Nota: `curl -I` es HEAD —
+   contra `/api/v1/health` específicamente da 404 por una particularidad preexistente del
+   router del backend con HEAD, no relacionada a esta migración; usar GET ahí si se necesita
+   probar ese endpoint: `curl -s -o /dev/null -w "%{http_code}\n" https://juanpablocano.com/api/v1/health`.)
 5. Limpieza (opcional, no bloqueante): `rm -rf nginx/ certbot/` en `/opt/portfolio` del droplet.
 
 ## Testing / Verificación
@@ -243,7 +252,7 @@ No tengo acceso SSH al droplet, así que este paso lo ejecuta el usuario. Docume
 ```bash
 docker compose up -d
 curl -I http://localhost/health          # 200 "healthy"
-curl -I http://localhost/api/v1/health   # proxied al backend
+curl -s -o /dev/null -w "%{http_code}\n" http://localhost/api/v1/health   # proxied al backend (GET — HEAD 404s on this route, pre-existing Gin behavior)
 curl -I http://localhost                 # proxied al frontend (puerto 3000 correcto)
 ```
 Confirmar que `docker compose ps` reporta `caddy` y `frontend` como `healthy` (el fix del
@@ -253,7 +262,7 @@ puerto del healthcheck del frontend se verifica aquí).
 ```bash
 docker compose logs caddy --tail 50 | grep -i "certificate obtained\|error"
 echo | openssl s_client -connect juanpablocano.com:443 -servername juanpablocano.com 2>/dev/null | openssl x509 -noout -dates
-curl -I https://juanpablocano.com/api/v1/health
+curl -s -o /dev/null -w "%{http_code}\n" https://juanpablocano.com/api/v1/health
 ```
 Abrir `https://juanpablocano.com` en el navegador y confirmar el candado sin advertencias.
 

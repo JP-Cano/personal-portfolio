@@ -31,7 +31,7 @@ This is a modern full-stack application with a clear separation of concerns:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                         Nginx (Reverse Proxy)                │
+│                         Caddy (Reverse Proxy)                │
 │                    SSL/TLS + Load Balancing                  │
 └───────────────┬─────────────────────────┬───────────────────┘
                 │                         │
@@ -70,7 +70,7 @@ This is a modern full-stack application with a clear separation of concerns:
 ### DevOps & Infrastructure
 - **[Docker](https://www.docker.com/)** - Containerization
 - **[Docker Compose](https://docs.docker.com/compose/)** - Multi-container orchestration
-- **[Nginx](https://nginx.org/)** - Reverse proxy and load balancer
+- **[Caddy](https://caddyserver.com/)** - Reverse proxy with automatic HTTPS
 - **[GitHub Actions](https://github.com/features/actions)** - CI/CD automation
 - **[Let's Encrypt](https://letsencrypt.org/)** - Free SSL/TLS certificates
 - **[DigitalOcean](https://www.digitalocean.com/)** - Cloud hosting platform
@@ -111,13 +111,10 @@ personal-portfolio/
 │   ├── public/                # Static assets
 │   └── Dockerfile             # Frontend container image
 │
-├── nginx/                      # Nginx configuration
-│   ├── nginx.conf             # Main config
-│   └── conf.d/                # Site-specific configs
+├── Caddyfile                   # Caddy reverse proxy config (dev + prod, env-driven)
 │
 ├── scripts/                    # Deployment scripts
 │   ├── setup-droplet.sh       # Server setup
-│   ├── ssl-setup.sh           # SSL configuration
 │   └── local-test.sh          # Local testing
 │
 ├── docs/                       # Documentation
@@ -188,8 +185,8 @@ For detailed deployment instructions, see [📖 DEPLOYMENT.md](docs/DEPLOYMENT.m
 # 1. Set up your server
 bash scripts/setup-droplet.sh
 
-# 2. Configure SSL
-bash scripts/ssl-setup.sh
+# 2. Configure SITE_ADDRESS and SSL_EMAIL in .env
+#    (Caddy obtains and renews the certificate automatically — no manual SSL step)
 
 # 3. Deploy application
 docker compose pull
@@ -265,7 +262,7 @@ Session-based authentication with secure HTTP-only cookies, allowing safe conten
 - Server-side rendering with Astro
 - Lazy loading for images and components
 - Optimized Docker images with multi-stage builds
-- Nginx caching and compression
+- Caddy compression (gzip/zstd)
 
 ### 📱 Mobile-First Design
 Responsive design that looks great on all devices, from phones to desktop monitors.
