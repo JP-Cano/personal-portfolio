@@ -68,6 +68,15 @@ services:
     image: nginx:alpine
     container_name: portfolio-nginx
     restart: unless-stopped
+    # Certbot renews certificates on disk but nginx only reads them once at
+    # startup; without a periodic reload, nginx keeps serving the expired
+    # certificate from memory until the container is recreated. This loop
+    # reloads (zero-downtime) every 6h so renewed certs are picked up.
+    # Note: overriding `command` here bypasses the official image's
+    # /docker-entrypoint.d/ startup scripts (envsubst on /etc/nginx/templates/
+    # etc). Harmless today since we mount nginx.conf/conf.d directly and use
+    # no templating, but keep that in mind before relying on those features.
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     ports:
       - "80:80"
       - "443:443"

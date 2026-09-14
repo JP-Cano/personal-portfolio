@@ -50,6 +50,19 @@ if [ -z "$DOMAIN" ] || [ -z "$SSL_EMAIL" ]; then
     exit 1
 fi
 
+cd /opt/portfolio
+
+# Fail fast, before anything gets torn down: this script overwrites
+# nginx/conf.d/default.conf with a temporary HTTP-only config in step 1 and
+# only replaces it with a working HTTPS config in step 4. If the production
+# template is missing, checking that now avoids leaving the site stuck on
+# "SSL setup in progress..." with no way back to serving HTTPS.
+if [ ! -f nginx/templates/default.prod.conf.template ]; then
+    error "nginx/templates/default.prod.conf.template not found"
+    error "This template is tracked in git; make sure your deployment checkout is up to date"
+    exit 1
+fi
+
 info "Setting up SSL certificate for: $DOMAIN"
 info "Email: $SSL_EMAIL"
 
@@ -58,7 +71,7 @@ info "Email: $SSL_EMAIL"
 # ============================================
 info "Creating temporary nginx configuration..."
 
-cat > /opt/portfolio/nginx/conf.d/default.conf << EOF
+cat > nginx/conf.d/default.conf << EOF
 server {
     listen 80;
     server_name $DOMAIN www.$DOMAIN;
@@ -80,7 +93,6 @@ success "Temporary nginx config created"
 # 2. Restart nginx with temporary config
 # ============================================
 info "Restarting nginx with temporary config..."
-cd /opt/portfolio
 docker compose restart nginx
 sleep 5
 success "Nginx restarted"
@@ -110,71 +122,12 @@ success "SSL certificate obtained!"
 # ============================================
 info "Creating production nginx configuration..."
 
-cat > nginx/conf.d/default.conf << 'EOFCONFIG'
-server {
-    listen 80;
-    server_name DOMAIN_PLACEHOLDER www.DOMAIN_PLACEHOLDER;
-
-    location /.well-known/acme-challenge/ {
-        root /var/www/certbot;
-    }
-
-    location / {
-        return 301 https://$host$request_uri;
-    }
-}
-
-server {
-    listen 443 ssl;
-    http2 on;
-    server_name DOMAIN_PLACEHOLDER www.DOMAIN_PLACEHOLDER;
-
-    ssl_certificate /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/DOMAIN_PLACEHOLDER/privkey.pem;
-
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_prefer_server_ciphers on;
-
-    add_header Strict-Transport-Security "max-age=31536000" always;
-
-    # Admin API routes - proxy to FRONTEND (Astro API routes)
-    location /api/admin/ {
-        proxy_pass http://frontend:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header Cookie $http_cookie;
-    }
-
-    location /api/ {
-        proxy_pass http://backend:8080;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    location /swagger/ {
-        proxy_pass http://backend:8080;
-        proxy_set_header Host $host;
-    }
-
-    location /certifications/ {
-        proxy_pass http://backend:8080;
-        proxy_set_header Host $host;
-    }
-
-    location / {
-        proxy_pass http://frontend:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-EOFCONFIG
-
-# Replace domain placeholder
-sed -i "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" nginx/conf.d/default.conf
+# The production config is tracked in git as a template (see
+# nginx/templates/default.prod.conf.template) instead of being generated
+# inline here, so the config actually served in production can be reviewed
+# and diffed like any other file. This just substitutes the domain into it.
+# (Existence of the template was already checked at the top of this script.)
+sed "s/DOMAIN_PLACEHOLDER/$DOMAIN/g" nginx/templates/default.prod.conf.template > nginx/conf.d/default.conf
 
 success "Production nginx config created"
 
