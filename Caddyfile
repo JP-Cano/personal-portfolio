@@ -1,0 +1,31 @@
+{
+	email {$SSL_EMAIL}
+}
+
+{$SITE_ADDRESS:80} {
+	encode gzip zstd
+
+	handle /health {
+		respond "healthy" 200
+	}
+
+	handle /api/admin/* {
+		reverse_proxy frontend:3000
+	}
+
+	handle /api/* {
+		reverse_proxy backend:8080
+	}
+
+	handle /swagger/* {
+		reverse_proxy backend:8080
+	}
+
+	handle /certifications/* {
+		reverse_proxy backend:8080
+	}
+
+	handle {
+		reverse_proxy frontend:3000
+	}
+}
