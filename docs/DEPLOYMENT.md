@@ -326,6 +326,7 @@ If you want to use [Turso](https://turso.tech) (distributed SQLite):
 - Non-root deployment user
 - Automatic security updates
 - SSL/TLS with Let's Encrypt (automatic via Caddy)
+- Strict-Transport-Security header (via Caddy)
 
 ### 🔒 Additional recommendations:
 
