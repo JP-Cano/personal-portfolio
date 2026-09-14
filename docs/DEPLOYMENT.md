@@ -103,6 +103,19 @@ nano .env
 scp .env deployer@YOUR_DROPLET_IP:/opt/portfolio/
 ```
 
+⚠️ **After SSL has already been set up (Step 6), re-running this `scp -r ... nginx ...` command is
+safe for the template but NOT for `nginx/conf.d/default.conf` itself.** `nginx/conf.d/default.conf`
+in the repo is the local/dev config (HTTP only) — it is only ever used locally. The real production
+config lives at `nginx/conf.d/default.conf` **on the droplet**, generated from
+`nginx/templates/default.prod.conf.template` by `scripts/ssl-setup.sh` (that template does get
+copied by this `scp`, which is fine — it's inert until `ssl-setup.sh` renders it). If you ever copy
+files to `/opt/portfolio` some other way (e.g. `rsync --delete`, or manually), make sure whatever
+you use does not overwrite `nginx/conf.d/default.conf` on the droplet with the repo's dev version:
+doing so breaks HTTPS and also breaks the `/.well-known/acme-challenge/` path certbot needs to renew
+the certificate — which silently kills auto-renewal until someone notices the site is down.
+To update the production nginx config, edit `nginx/templates/default.prod.conf.template` in git and
+re-run `scripts/ssl-setup.sh` on the droplet.
+
 ### Your `.env` file should include:
 ```env
 # Backend
@@ -453,15 +466,28 @@ docker compose -f docker-compose.yml restart backend
 ```
 
 ### SSL certificate issues:
+
+The `certbot` container renews certificates on disk, but it cannot reload nginx itself (the
+`certbot/certbot` image has no docker client or socket access). The `nginx` service's `command`
+in `docker-compose.yml` reloads nginx (zero-downtime) every 6 hours on its own so renewed
+certificates get picked up automatically — you normally don't need to do anything manually.
+
 ```bash
-# Check certificate status
+# Check certificate status (and confirm there's only one lineage per domain)
 docker compose -f docker-compose.yml run --rm certbot certificates
+
+# Compare the certificate nginx is actually serving vs. what's on disk
+echo | openssl s_client -connect yourdomain.com:443 -servername yourdomain.com 2>/dev/null | openssl x509 -noout -dates
+docker exec portfolio-nginx openssl x509 -enddate -noout -in /etc/letsencrypt/live/yourdomain.com/fullchain.pem
+
+# Test that renewal actually works end-to-end (does not consume rate limits)
+docker compose -f docker-compose.yml run --rm certbot renew --dry-run
 
 # Renew certificate manually
 docker compose -f docker-compose.yml run --rm certbot renew
 
-# Restart nginx
-docker compose -f docker-compose.yml restart nginx
+# Force an immediate reload instead of waiting up to 6h for the automatic one
+docker exec portfolio-nginx nginx -s reload
 ```
 
 ### Out of disk space:
