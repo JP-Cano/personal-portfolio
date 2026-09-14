@@ -13,7 +13,7 @@ This guide will help you deploy your portfolio to DigitalOcean with automatic CI
 
 This setup includes:
 - ✅ Docker & Docker Compose for containerization
-- ✅ Nginx as reverse proxy
+- ✅ Caddy as reverse proxy
 - ✅ Let's Encrypt SSL certificates (auto-renewal)
 - ✅ GitHub Actions for CI/CD (auto-deploy on push to main)
 - ✅ Zero-downtime deployments
@@ -92,7 +92,8 @@ ssh -i ~/.ssh/portfolio_deploy deployer@YOUR_DROPLET_IP
 ### From your local machine:
 ```bash
 # Copy required files to droplet
-scp -r docker-compose.yml nginx scripts deployer@YOUR_DROPLET_IP:/opt/portfolio/
+scp docker-compose.yml Caddyfile deployer@YOUR_DROPLET_IP:/opt/portfolio/
+scp -r scripts deployer@YOUR_DROPLET_IP:/opt/portfolio/
 
 # Copy environment file
 cp .env.example .env
@@ -103,18 +104,11 @@ nano .env
 scp .env deployer@YOUR_DROPLET_IP:/opt/portfolio/
 ```
 
-⚠️ **After SSL has already been set up (Step 6), re-running this `scp -r ... nginx ...` command is
-safe for the template but NOT for `nginx/conf.d/default.conf` itself.** `nginx/conf.d/default.conf`
-in the repo is the local/dev config (HTTP only) — it is only ever used locally. The real production
-config lives at `nginx/conf.d/default.conf` **on the droplet**, generated from
-`nginx/templates/default.prod.conf.template` by `scripts/ssl-setup.sh` (that template does get
-copied by this `scp`, which is fine — it's inert until `ssl-setup.sh` renders it). If you ever copy
-files to `/opt/portfolio` some other way (e.g. `rsync --delete`, or manually), make sure whatever
-you use does not overwrite `nginx/conf.d/default.conf` on the droplet with the repo's dev version:
-doing so breaks HTTPS and also breaks the `/.well-known/acme-challenge/` path certbot needs to renew
-the certificate — which silently kills auto-renewal until someone notices the site is down.
-To update the production nginx config, edit `nginx/templates/default.prod.conf.template` in git and
-re-run `scripts/ssl-setup.sh` on the droplet.
+ℹ️ Unlike the old nginx setup, the `Caddyfile` is identical in local dev and production — it's
+driven entirely by the `SITE_ADDRESS`/`SSL_EMAIL` env vars, so there's no droplet-only generated
+config file that a careless copy could clobber. From this point on, `.github/workflows/deploy.yml`
+keeps `docker-compose.yml` and `Caddyfile` in sync automatically on every push to `main` (see
+Step 6) — you only need to `scp` manually once, here.
 
 ### Your `.env` file should include:
 ```env
@@ -129,8 +123,8 @@ FRONTEND_PORT=4321
 PORTFOLIO_BACKEND_URL=http://backend:8080
 ENVIRONMENT=production
 
-# Domain (update these!)
-DOMAIN=yourdomain.com
+# Site address for Caddy (space-separated if more than one)
+SITE_ADDRESS="yourdomain.com www.yourdomain.com"
 SSL_EMAIL=your-email@example.com
 ```
 
@@ -155,38 +149,7 @@ If you have a domain:
 
 ---
 
-## 🔒 Step 6: Set Up SSL Certificate
-
-### SSH into your Droplet:
-```bash
-ssh deployer@YOUR_DROPLET_IP
-cd /opt/portfolio
-```
-
-### Run SSL setup script:
-```bash
-chmod +x scripts/ssl-setup.sh
-bash scripts/ssl-setup.sh
-```
-
-This will:
-- Start nginx with HTTP configuration
-- Obtain SSL certificates from Let's Encrypt
-- Update nginx with HTTPS configuration
-- Start all services with SSL
-
-### Verify SSL:
-```bash
-# Check if all services are running
-docker compose -f docker-compose.yml ps
-
-# Test HTTPS
-curl -I https://yourdomain.com
-```
-
----
-
-## 🤖 Step 7: Set Up GitHub Actions (CI/CD)
+## 🤖 Step 6: Set Up GitHub Actions (CI/CD)
 
 ### 1. Make your GitHub Container Registry (GHCR) public or set up access
 
@@ -225,7 +188,7 @@ git push origin main
 
 ---
 
-## 📊 Step 8: Verify Deployment
+## 📊 Step 7: Verify Deployment
 
 ### Check all services:
 ```bash
@@ -241,7 +204,7 @@ docker compose -f docker-compose.yml logs -f
 # Check individual service logs
 docker compose -f docker-compose.yml logs backend
 docker compose -f docker-compose.yml logs frontend
-docker compose -f docker-compose.yml logs nginx
+docker compose -f docker-compose.yml logs caddy
 ```
 
 ### Test your endpoints:
@@ -362,8 +325,7 @@ If you want to use [Turso](https://turso.tech) (distributed SQLite):
 - Firewall (UFW) allows only SSH, HTTP, HTTPS
 - Non-root deployment user
 - Automatic security updates
-- SSL/TLS with Let's Encrypt
-- Security headers in nginx
+- SSL/TLS with Let's Encrypt (automatic via Caddy)
 
 ### 🔒 Additional recommendations:
 
@@ -467,27 +429,19 @@ docker compose -f docker-compose.yml restart backend
 
 ### SSL certificate issues:
 
-The `certbot` container renews certificates on disk, but it cannot reload nginx itself (the
-`certbot/certbot` image has no docker client or socket access). The `nginx` service's `command`
-in `docker-compose.yml` reloads nginx (zero-downtime) every 6 hours on its own so renewed
-certificates get picked up automatically — you normally don't need to do anything manually.
+Caddy obtains, serves, and renews the certificate itself — there's no separate renewal process
+that can fall out of sync with what's being served, so this should rarely need manual attention.
 
 ```bash
-# Check certificate status (and confirm there's only one lineage per domain)
-docker compose -f docker-compose.yml run --rm certbot certificates
+# View Caddy's logs (includes ACME obtain/renew activity and any errors)
+docker compose -f docker-compose.yml logs caddy --tail 100
 
-# Compare the certificate nginx is actually serving vs. what's on disk
+# Confirm the certificate actually being served
 echo | openssl s_client -connect yourdomain.com:443 -servername yourdomain.com 2>/dev/null | openssl x509 -noout -dates
-docker exec portfolio-nginx openssl x509 -enddate -noout -in /etc/letsencrypt/live/yourdomain.com/fullchain.pem
 
-# Test that renewal actually works end-to-end (does not consume rate limits)
-docker compose -f docker-compose.yml run --rm certbot renew --dry-run
-
-# Renew certificate manually
-docker compose -f docker-compose.yml run --rm certbot renew
-
-# Force an immediate reload instead of waiting up to 6h for the automatic one
-docker exec portfolio-nginx nginx -s reload
+# Force Caddy to reload its config (rarely needed — Caddy watches the mounted
+# Caddyfile and reloads on its own when it changes)
+docker exec portfolio-caddy caddy reload --config /etc/caddy/Caddyfile
 ```
 
 ### Out of disk space:
@@ -527,7 +481,7 @@ Your current setup costs **$6/month** with DigitalOcean's basic droplet.
 By completing this deployment, you've gained experience with:
 
 ✅ **Docker & Docker Compose** - containerization and orchestration  
-✅ **Nginx** - reverse proxy and web server configuration  
+✅ **Caddy** - reverse proxy and automatic HTTPS  
 ✅ **SSL/TLS** - Let's Encrypt certificate management  
 ✅ **GitHub Actions** - CI/CD pipeline automation  
 ✅ **Linux server administration** - user management, firewall, SSH  
@@ -541,7 +495,7 @@ By completing this deployment, you've gained experience with:
 1. **Custom domain**: If you haven't already, configure your domain
 2. **Monitoring**: Set up monitoring/alerting (Uptime Robot, Better Stack)
 3. **Analytics**: Add analytics to your portfolio (Plausible, Simple Analytics)
-4. **Performance**: Enable caching in nginx for static assets
+4. **Performance**: Enable caching in Caddy for static assets
 5. **Backups**: Set up automated database backups
 6. **Staging environment**: Create a separate branch for testing
 
@@ -550,7 +504,7 @@ By completing this deployment, you've gained experience with:
 ## 📚 Additional Resources
 
 - [Docker Documentation](https://docs.docker.com/)
-- [Nginx Documentation](https://nginx.org/en/docs/)
+- [Caddy Documentation](https://caddyserver.com/docs/)
 - [Let's Encrypt Documentation](https://letsencrypt.org/docs/)
 - [GitHub Actions Documentation](https://docs.github.com/en/actions)
 - [DigitalOcean Tutorials](https://www.digitalocean.com/community/tutorials)
