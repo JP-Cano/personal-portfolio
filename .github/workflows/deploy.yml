@@ -102,10 +102,15 @@ jobs:
             
             # Pull latest images
             docker compose pull
-            
+
             # Restart services with zero-downtime
             docker compose up -d --remove-orphans
-            
+
+            # Compose doesn't recreate a container just because a bind-mounted
+            # file's contents changed (only the service definition is hashed),
+            # so force-recreate caddy specifically to pick up any Caddyfile change.
+            docker compose up -d --force-recreate caddy
+
             # Clean up old images
             docker image prune -af --filter "until=24h"
             

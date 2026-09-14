@@ -1,5 +1,5 @@
 {
-	email {$SSL_EMAIL}
+	email {$SSL_EMAIL:your-email@example.com}
 }
 
 # Note: double colon syntax {$VAR::default} sets default to ":80" (port 80);
