@@ -2,7 +2,9 @@
 	email {$SSL_EMAIL}
 }
 
-{$SITE_ADDRESS:80} {
+# Note: double colon syntax {$VAR::default} sets default to ":80" (port 80);
+# single colon would treat "80" as a bare hostname. This ensures local dev gets HTTP on :80.
+{$SITE_ADDRESS::80} {
 	encode gzip zstd
 
 	handle /health {
